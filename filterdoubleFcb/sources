@@ -4,10 +4,17 @@ TARGETTYPE=DRIVER
 DRIVERTYPE=FS
 DRIVERBASE= 0x003000000
 
-TARGETLIBS=\
-           $(DDK_LIB_PATH)\ntstrsafe.lib \
-           $(DDK_LIB_PATH)\wdmsec.lib\
+LIBPATH=lib\$(BUILD_ALT_DIR)
+INCLUDES=$(INCLUDES);include
 
+TARGETLIBS=$(TARGETLIBS)\
+           $(DDK_LIB_PATH)\ntstrsafe.lib \
+		   $(DDK_LIB_PATH)\libcntpr.lib	\
+           $(DDK_LIB_PATH)\wdmsec.lib\
+		   $(LIBPATH)\*\htscpp.lib\
+		   $(IFSKIT_LIB_PATH)\fltMgr.lib
+
+LINKER_FLAGS = $(LINKER_FLAGS) /integritycheck
 
 SOURCES=filespy.c  \
         fspyLib.c  \
@@ -43,7 +50,7 @@ SOURCES=filespy.c  \
         Aestab.c \
         Blowfish.c \
         Cast.c \
-         Des.c \
+        Des.c \
         Rmd160.c \
         Serpent.c \
         Sha1.c \
@@ -64,4 +71,16 @@ SOURCES=filespy.c  \
         PfpProcessExclude.c \
         Fake_function.c \
         Regfilter.c \
+		Data.cpp \
+		Utils.cpp\
+		NtMem.c  \
+		Hex.cpp  \
+		FileUtils.cpp \
+		CryptUtils.cpp \
+		Common.cpp     \
+		base64.c  \
+		CryptBox.cpp \
+		Rc4.cpp  \
         filespy.rc
+
+MSC_WARNING_LEVEL=/W1

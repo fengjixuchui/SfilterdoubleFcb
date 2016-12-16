@@ -1,0 +1,1 @@
+call BuildVersion.bat win7 checked 64

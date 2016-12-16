@@ -177,6 +177,7 @@
     <NMakePreprocessorDefinitions>DBG=0;WINVER=0x0601;NTDDI_VERSION=0x06010000;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(W7BASE)\inc\ddk\;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <ExecutablePath>D:\;$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='W7 checked (PREfast)|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
@@ -281,8 +282,13 @@
     <ClCompile Include="Aescrypt.c" />
     <ClCompile Include="Aeskey.c" />
     <ClCompile Include="Aestab.c" />
+    <ClCompile Include="base64.c" />
     <ClCompile Include="Blowfish.c" />
     <ClCompile Include="Cast.c" />
+    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="CryptBox.cpp" />
+    <ClCompile Include="CryptUtils.cpp" />
+    <ClCompile Include="Data.cpp" />
     <ClCompile Include="DelayClose.c" />
     <ClCompile Include="Des.c" />
     <ClCompile Include="DeviceIoControl.c" />
@@ -291,14 +297,17 @@
     <ClCompile Include="fastlock.c" />
     <ClCompile Include="fastquery.c" />
     <ClCompile Include="filespy.c" />
+    <ClCompile Include="FileUtils.cpp" />
     <ClCompile Include="fspyCtx.c" />
     <ClCompile Include="fspyHash.c" />
     <ClCompile Include="fspyLib.c" />
     <ClCompile Include="fspyTx.c" />
     <ClCompile Include="fstiosup.c" />
+    <ClCompile Include="Hex.cpp" />
     <ClCompile Include="Log.c" />
     <ClCompile Include="md5.c" />
     <ClCompile Include="namelookup.c" />
+    <ClCompile Include="NtMem.c" />
     <ClCompile Include="PfpBackUpThread.c" />
     <ClCompile Include="pfpCache.c" />
     <ClCompile Include="Pfpcleanup.c" />
@@ -322,6 +331,7 @@
     <ClCompile Include="Pfpworkque.c" />
     <ClCompile Include="PfpWrite.c" />
     <ClCompile Include="ProcNotify.c" />
+    <ClCompile Include="Rc4.cpp" />
     <ClCompile Include="RegFilter.c" />
     <ClCompile Include="resrcsup.c" />
     <ClCompile Include="Rmd160.c" />
@@ -330,6 +340,7 @@
     <ClCompile Include="Sha2.c" />
     <ClCompile Include="strucsup.c" />
     <ClCompile Include="Twofish.c" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VerifyKey.c" />
     <ClCompile Include="Whirlpool.c" />
   </ItemGroup>
@@ -339,18 +350,33 @@
     <ClInclude Include="Aestab.h" />
     <ClInclude Include="Blowfish.h" />
     <ClInclude Include="Cast.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="CryptUtils.h" />
+    <ClInclude Include="Data.h" />
     <ClInclude Include="Des.h" />
     <ClInclude Include="Endian.h" />
     <ClInclude Include="Fake_function.h" />
     <ClInclude Include="filespy.h" />
+    <ClInclude Include="FileUtils.h" />
     <ClInclude Include="fspydef.h" />
     <ClInclude Include="fspyKern.h" />
+    <ClInclude Include="Global.h" />
+    <ClInclude Include="Hex.h" />
+    <ClInclude Include="Include\base64.h" />
+    <ClInclude Include="Include\BaseTypes.h" />
+    <ClInclude Include="Include\CryptBox.h" />
+    <ClInclude Include="Include\DriverConf.h" />
+    <ClInclude Include="Include\FileConf.h" />
+    <ClInclude Include="Include\NetConf.h" />
+    <ClInclude Include="Include\PolicyConf.h" />
     <ClInclude Include="LOG - Copy.h" />
     <ClInclude Include="LOG.h" />
     <ClInclude Include="MD5.h" />
     <ClInclude Include="Md5g.h" />
     <ClInclude Include="namelookupdef.h" />
+    <ClInclude Include="NtMem.h" />
     <ClInclude Include="PfpCreate.h" />
+    <ClInclude Include="Rc4.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Rmd160.h" />
     <ClInclude Include="Serpent.h" />
@@ -359,8 +385,10 @@
     <ClInclude Include="Tcdefs.h" />
     <ClInclude Include="Twofish.h" />
     <ClInclude Include="usbsecure.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="VerifyKey.h" />
     <ClInclude Include="VMProtectDDK22.h" />
+    <ClInclude Include="WDK.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="filespy.rc" />

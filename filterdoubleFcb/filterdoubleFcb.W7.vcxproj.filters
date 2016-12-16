@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{b9b57983-2e4f-46f4-9030-c890aae4b659}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;def;asm;mc</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{ff2c55c4-e952-402a-b6ef-dc6ed2c6c1f0}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{16e3ccd5-c6c1-4745-b905-88d334efb597}</UniqueIdentifier>
       <Extensions>rc;mc;ico;cur;bmp;dlg;rc2</Extensions>
@@ -17,252 +9,362 @@
       <UniqueIdentifier>{876582c4-b16c-43fc-bcd0-18c416da7b7d}</UniqueIdentifier>
       <Extensions>*</Extensions>
     </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{b8b84fec-d87f-4114-bd5c-1be8f240ae48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include">
+      <UniqueIdentifier>{5a1238f2-1170-4c02-8187-920002bb949a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include\Hash">
+      <UniqueIdentifier>{2d148cb6-1436-4cb5-9931-afc5b32f1db0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include\Crypt">
+      <UniqueIdentifier>{46e3a41b-1578-4eef-804f-3791b4896aac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include\JSON">
+      <UniqueIdentifier>{142d4110-8a7b-4d5c-a9e9-bebe20f330f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FilterSources">
+      <UniqueIdentifier>{b9b57983-2e4f-46f4-9030-c890aae4b659}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;asm;mc</Extensions>
+    </Filter>
+    <Filter Include="FilterHeader">
+      <UniqueIdentifier>{ff2c55c4-e952-402a-b6ef-dc6ed2c6c1f0}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx</Extensions>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{afc6c25a-8f0f-4043-841b-263690e1d423}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{529650e7-5c98-48ee-8906-0717de3150d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Aescrypt.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Aeskey.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Aestab.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Blowfish.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Cast.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="DelayClose.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Des.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="DeviceIoControl.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Endian.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Fake_function.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="fastlock.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="fastquery.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="filespy.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="fspyCtx.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="fspyHash.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="fspyLib.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="fspyTx.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="fstiosup.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Log.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="md5.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="namelookup.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpBackUpThread.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="pfpCache.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Pfpcleanup.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Pfpclose.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpConfigSetting.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpCreate.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpData.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Pfpdeviosup.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Pfpdisp.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpFile.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpFileInfo.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpFlush.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpFolderProtect.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpHide.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpProcessExclude.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpProcessInfo.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpRead.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpUsbDevice.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpUsbSecure.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpVirtualDir.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Pfpworkque.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="PfpWrite.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="ProcNotify.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="RegFilter.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="resrcsup.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Rmd160.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Serpent.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Sha1.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Sha2.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="strucsup.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Twofish.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="VerifyKey.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
     </ClCompile>
     <ClCompile Include="Whirlpool.c">
-      <Filter>Source Files</Filter>
+      <Filter>FilterSources</Filter>
+    </ClCompile>
+    <ClCompile Include="Data.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="base64.c">
+      <Filter>Include</Filter>
+    </ClCompile>
+    <ClCompile Include="CryptBox.cpp">
+      <Filter>Include\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Rc4.cpp">
+      <Filter>Include\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CryptUtils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="FileUtils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Hex.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="NtMem.c">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aes.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Aesopt.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Aestab.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Blowfish.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Cast.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Des.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Endian.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Fake_function.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="filespy.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="fspydef.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="fspyKern.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="LOG - Copy.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="LOG.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="MD5.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Md5g.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="namelookupdef.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="PfpCreate.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Rmd160.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Serpent.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Sha1.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Sha2.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Tcdefs.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="Twofish.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="usbsecure.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="VerifyKey.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
     </ClInclude>
     <ClInclude Include="VMProtectDDK22.h">
-      <Filter>Header Files</Filter>
+      <Filter>FilterHeader</Filter>
+    </ClInclude>
+    <ClInclude Include="Data.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="WDK.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\base64.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\DriverConf.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\FileConf.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\NetConf.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\PolicyConf.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\BaseTypes.h">
+      <Filter>Include\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\CryptBox.h">
+      <Filter>Include\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Rc4.h">
+      <Filter>Include\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CryptUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FileUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Hex.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="NtMem.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Global.h">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
