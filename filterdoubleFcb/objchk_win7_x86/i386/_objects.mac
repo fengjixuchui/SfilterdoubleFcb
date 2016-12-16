@@ -58,6 +58,7 @@
  $(OBJ_PATH)\$O\regfilter.obj \
  $(OBJ_PATH)\$O\ntmem.obj \
  $(OBJ_PATH)\$O\base64.obj \
+ $(OBJ_PATH)\$O\strtod.obj \
  $(OBJ_PATH)\$O\data.obj \
  $(OBJ_PATH)\$O\utils.obj \
  $(OBJ_PATH)\$O\hex.obj \
@@ -66,6 +67,7 @@
  $(OBJ_PATH)\$O\common.obj \
  $(OBJ_PATH)\$O\cryptbox.obj \
  $(OBJ_PATH)\$O\rc4.obj \
+ $(OBJ_PATH)\$O\crc32.obj \
 
 
 _RES_FILE=$(OBJ_PATH)\$O\filespy.res

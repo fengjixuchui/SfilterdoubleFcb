@@ -286,6 +286,7 @@
     <ClCompile Include="Blowfish.c" />
     <ClCompile Include="Cast.c" />
     <ClCompile Include="Common.cpp" />
+    <ClCompile Include="Crc32.cpp" />
     <ClCompile Include="CryptBox.cpp" />
     <ClCompile Include="CryptUtils.cpp" />
     <ClCompile Include="Data.cpp" />
@@ -364,6 +365,7 @@
     <ClInclude Include="Hex.h" />
     <ClInclude Include="Include\base64.h" />
     <ClInclude Include="Include\BaseTypes.h" />
+    <ClInclude Include="Include\Crc32.h" />
     <ClInclude Include="Include\CryptBox.h" />
     <ClInclude Include="Include\DriverConf.h" />
     <ClInclude Include="Include\FileConf.h" />

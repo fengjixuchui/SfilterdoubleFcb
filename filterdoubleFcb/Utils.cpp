@@ -15,7 +15,8 @@
 #include "Include/BaseTypes.h"
 #include "CryptUtils.h"
 #include "Include/strtod.h"
-
+///
+#include "NtMem.h"
 
 //VOID GenerateUUID(CHAR UUID[UUID_LEN], INT random)
 //{

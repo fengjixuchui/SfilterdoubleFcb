@@ -81,6 +81,8 @@ SOURCES=filespy.c  \
 		base64.c  \
 		CryptBox.cpp \
 		Rc4.cpp  \
+		strtod.c \
+		CRC32.cpp \
         filespy.rc
 
 MSC_WARNING_LEVEL=/W1

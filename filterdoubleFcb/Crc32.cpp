@@ -1,4 +1,4 @@
-#include "Crc32.h"
+#include "Include/Crc32.h"
 
 unsigned long g_Crc32Table[256] = 
 {
