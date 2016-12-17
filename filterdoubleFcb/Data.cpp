@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include "Common.h"
 #include "WDK.h"
+#include "Data_Extern_C.h"
 //#include "Log.h"
 
 PCHAR ImportFunName = "StartGuard";//"InitDll";

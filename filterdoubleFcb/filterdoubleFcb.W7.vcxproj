@@ -285,6 +285,8 @@
     <ClCompile Include="base64.c" />
     <ClCompile Include="Blowfish.c" />
     <ClCompile Include="Cast.c" />
+    <ClCompile Include="cJSON.c" />
+    <ClCompile Include="cJSON_Utils.c" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Crc32.cpp" />
     <ClCompile Include="CryptBox.cpp" />
@@ -339,6 +341,7 @@
     <ClCompile Include="Serpent.c" />
     <ClCompile Include="Sha1.c" />
     <ClCompile Include="Sha2.c" />
+    <ClCompile Include="strtod.c" />
     <ClCompile Include="strucsup.c" />
     <ClCompile Include="Twofish.c" />
     <ClCompile Include="Utils.cpp" />
@@ -354,6 +357,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="CryptUtils.h" />
     <ClInclude Include="Data.h" />
+    <ClInclude Include="Data_Extern_C.h" />
     <ClInclude Include="Des.h" />
     <ClInclude Include="Endian.h" />
     <ClInclude Include="Fake_function.h" />
@@ -365,12 +369,16 @@
     <ClInclude Include="Hex.h" />
     <ClInclude Include="Include\base64.h" />
     <ClInclude Include="Include\BaseTypes.h" />
+    <ClInclude Include="Include\cJSON.h" />
+    <ClInclude Include="Include\cJSON_Utils.h" />
     <ClInclude Include="Include\Crc32.h" />
     <ClInclude Include="Include\CryptBox.h" />
     <ClInclude Include="Include\DriverConf.h" />
     <ClInclude Include="Include\FileConf.h" />
+    <ClInclude Include="Include\MySTL.h" />
     <ClInclude Include="Include\NetConf.h" />
     <ClInclude Include="Include\PolicyConf.h" />
+    <ClInclude Include="Include\strtod.h" />
     <ClInclude Include="LOG - Copy.h" />
     <ClInclude Include="LOG.h" />
     <ClInclude Include="MD5.h" />

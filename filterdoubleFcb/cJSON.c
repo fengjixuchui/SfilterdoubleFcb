@@ -44,8 +44,8 @@
 #include <float.h>
 #include <limits.h>
 #include <ctype.h>
-#include "Log.h"
-#include "strtod.h"
+//#include "Log.h"
+#include "include/strtod.h"
 #include <locale.h>
 
 #ifdef ENABLE_LOCALES
@@ -59,7 +59,7 @@
 #pragma GCC visibility pop
 #endif
 
-#include "cJSON.h"
+#include "include/cJSON.h"
 
 /* define our own boolean type */
 #define true ((cJSON_bool)1)

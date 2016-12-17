@@ -59,6 +59,8 @@
  $(OBJ_PATH)\$O\ntmem.obj \
  $(OBJ_PATH)\$O\base64.obj \
  $(OBJ_PATH)\$O\strtod.obj \
+ $(OBJ_PATH)\$O\cjson.obj \
+ $(OBJ_PATH)\$O\cjson_utils.obj \
  $(OBJ_PATH)\$O\data.obj \
  $(OBJ_PATH)\$O\utils.obj \
  $(OBJ_PATH)\$O\hex.obj \

@@ -235,6 +235,15 @@
     <ClCompile Include="Crc32.cpp">
       <Filter>Include\Hash</Filter>
     </ClCompile>
+    <ClCompile Include="cJSON.c">
+      <Filter>Include\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="cJSON_Utils.c">
+      <Filter>Include\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="strtod.c">
+      <Filter>Include\JSON</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aes.h">
@@ -371,6 +380,21 @@
     </ClInclude>
     <ClInclude Include="Include\Crc32.h">
       <Filter>Include\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\MySTL.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Data_Extern_C.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\cJSON.h">
+      <Filter>Include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\cJSON_Utils.h">
+      <Filter>Include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\strtod.h">
+      <Filter>Include\JSON</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

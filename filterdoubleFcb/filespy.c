@@ -50,6 +50,7 @@ Environment:
 #include "UsbSecure.h"
 #include "PfpCreate.h"
 #include <ntstrsafe.h>
+#include "Data_Extern_C.h"
 //
 //  list of known device types
 //
@@ -267,7 +268,7 @@ Return Value:
 	RtlZeroMemory(ProcName, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR));
 	wcscpy(ProcName, L"WPS.EXE");
 
-	DbgBreakPoint();
+	//DbgBreakPoint();
 
 
 
@@ -297,6 +298,22 @@ Return Value:
 	}
 	RtlZeroMemory(tmp, (wcslen(L"WPSOFFICE.EXE") + 1) * sizeof(WCHAR));
 	wcscpy(tmp, L"WPSOFFICE.EXE");
+	//上面有一部分废代码
+
+	InitData(DriverObject);
+	status = InitSystemRootPath();
+	if (!NT_SUCCESS(status))
+	{
+		//DebugTrace(DEBUG_TRACE_ERROR, ("FileSafe!DriverEntry -> InitSystemRootPath Fail! Status = 0x%08x\n", status));
+		status = STATUS_UNSUCCESSFUL;
+		return status;
+	}
+
+
+
+
+
+
 
 
 	//InitializeWChar(tmp, "TMP");

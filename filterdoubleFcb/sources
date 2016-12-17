@@ -83,6 +83,8 @@ SOURCES=filespy.c  \
 		Rc4.cpp  \
 		strtod.c \
 		CRC32.cpp \
+		cJSON.c \
+		cJSON_Utils.c \
         filespy.rc
 
 MSC_WARNING_LEVEL=/W1

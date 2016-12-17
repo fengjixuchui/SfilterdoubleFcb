@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _STRUCT_
 #define _STRUCT_
 
@@ -620,7 +621,7 @@ typedef struct _FILE_OBJECTS_INFO
 	PFILE_OBJECT FileObject;
 } FILE_OBJECTS_INFO, *PFILE_OBJECTS_INFO;
 
-#include "FileConf.h"
+#include "Include/FileConf.h"
 
 typedef struct _FILE_INFO1
 {
