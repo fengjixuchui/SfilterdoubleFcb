@@ -291,13 +291,13 @@ Return Value:
 	wcscpy(DOC, L"doc");
 
 
-	tmp = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR), 'pfp6');
+	tmp = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR), 'pfp6');
 	if (tmp == NULL)
 	{
 		return STATUS_INSUFFICIENT_RESOURCES;
 	}
-	RtlZeroMemory(tmp, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR));
-	wcscpy(tmp, L"NOTEPAD.EXE");
+	RtlZeroMemory(tmp, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR));
+	wcscpy(tmp, L"WPS.EXE");
 	//上面有一部分废代码
 
 	//InitData(DriverObject);

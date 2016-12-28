@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<DEFECTS>
-<OACRDEFECTCOUNT>2</OACRDEFECTCOUNT>
-<OACRERRORCOUNT>0</OACRERRORCOUNT>
-<DEFECT _seq="1"><SFA><LINE>42</LINE><COLUMN>5</COLUMN><FILENAME>pfpworkque.c</FILENAME><FILEPATH>c:\users\wrench\desktop\sfilterdoublefcb\filterdoublefcb\</FILEPATH></SFA><DEFECTCODE>28155</DEFECTCODE><DESCRIPTION>The function being assigned or passed should be a IO_WORKITEM_ROUTINE function:  Add the declaration 'IO_WORKITEM_ROUTINE PfpFspDispatchEX;' before the current first declaration of PfpFspDispatchEX.</DESCRIPTION><FUNCTION>PfpAddToWorkque</FUNCTION><FUNCLINE>8</FUNCLINE><PATH/></DEFECT>
-<DEFECT _seq="2"><SFA><LINE>59</LINE><COLUMN>0</COLUMN><FILENAME>pfpworkque.c</FILENAME><FILEPATH>c:\users\wrench\desktop\sfilterdoublefcb\filterdoublefcb\</FILEPATH></SFA><DEFECTCODE>28172</DEFECTCODE><DESCRIPTION>The function 'PfpOplockComplete' has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment.</DESCRIPTION><FUNCTION>PfpOplockComplete</FUNCTION><FUNCLINE>59</FUNCLINE><PATH/></DEFECT>
-</DEFECTS>

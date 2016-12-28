@@ -300,7 +300,7 @@ NTSTATUS - The return status for the operation
 	// we do not unmap it on the way out.
 	//
 
-	DbgBreakPoint();
+	//DbgBreakPoint();
 
 	//ASSERT_IRP_CONTEXT( IrpContext );
 	//ASSERT_IRP( Irp );
@@ -972,14 +972,14 @@ NTSTATUS - The return status for the operation
 		
 				if(pFcb->bNeedEncrypt)
 				{
-					IrpContext->Union.NtfsIoContext->rst = TRUE;
+					//IrpContext->Union.NtfsIoContext->rst = TRUE;
 					OffsetNew+=ENCRYPTIONHEADLENGTH;
-					if (pFcb->Encryptbyer ==TRUE)
-					{
-					OffsetNew -= ENCRYPTIONHEADLENGTH;
-					IrpContext->Union.NtfsIoContext->rst = FALSE;
+					//if (pFcb->Encryptbyer ==TRUE)
+					//{
+					//OffsetNew -= ENCRYPTIONHEADLENGTH;
+					//IrpContext->Union.NtfsIoContext->rst = FALSE;
 					KdPrint(("The process reading when the encrypt id is  Found ! readbytes is :%d \r\n", BytesToRead));
-					}
+					//}
 				}
 				
 				
@@ -1613,7 +1613,7 @@ PfpNonCachedAsyncIoCompleteRead(
 				
 				//if (PfpGetProcessInfoForCurProc())
 				//{
-				DbgBreakPoint();
+				//DbgBreakPoint();
 					PfpDecryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_den_context);
 					KdPrint(("PfpNonCachedAsyncIoCompleteRead--------------DecryptBuffter-------------\r\n"));
 					KdPrint(("Read File  Byte cout :%d \r\n", (ULONG)Irp->IoStatus.Information));

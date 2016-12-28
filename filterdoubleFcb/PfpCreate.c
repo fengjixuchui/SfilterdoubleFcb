@@ -611,6 +611,27 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
 
     //创建目录 不处理
     // 打开directory 的操作
+	 //{
+	 //              //FILE_OPEN_REPARSE_POINT 是处理应用程序自己定义的数据，加密驱动里面没必要多它的这个数据进行加密
+     if(pstack->Parameters.Create.Options&FILE_OPEN_REPARSE_POINT)
+	 {
+		 //KdPrint(("[Wrench]应用程序自己定义的数据,pass\r\n"));
+	     goto PASSTHROUGH;
+	 }
+
+	 if (IsOpenDirectory(pstack->Flags) || IsDirectory(pstack->Parameters.Create.Options))
+	 {
+		 goto PASSTHROUGH;
+	 }
+     if((FileFullPath.Buffer[(FileFullPath.Length>>1)-1]==L'\\') /*||PfpFindExcludProcess(PsGetProcessId(IoGetCurrentProcess() ))*/)
+     {
+         goto PASSTHROUGH;
+     }
+      if(bOpenFileStream)
+     {
+         goto PASSTHROUGH;	
+	 }
+
 
 
     if(pDeviceResouce== NULL)
@@ -764,21 +785,22 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
     }
     // 对于 符合文件的操作，还要考虑这个文件的 操作的是不是合法的
     // 文件不存在的时候 是不允许 以 打开或者覆盖的方式来 访问文件的、
-    Options = pstack->Parameters.Create.Options;
-    Options = ((Options>> 24) & 0x000000FF);
-    if( AcsType ==ACCESSING_FILE_NONEXIST && ( Options == FILE_OPEN ||Options == FILE_OVERWRITE)&& !PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject) )
-    {
-        if(!PfpIsFileNameValid(pFileObject->FileName.Buffer,pFileObject->FileName.Length))
-        {
-            iostatus.Status			= STATUS_OBJECT_NAME_INVALID;
-        }
-        else
-        {
-            iostatus.Status			= STATUS_OBJECT_NAME_NOT_FOUND;
-        }
-        iostatus.Information	= 0;
-        goto EXIT;	
-    }
+	//DbgBreakPoint();
+	Options = pstack->Parameters.Create.Options;
+	Options = ((Options >> 24) & 0x000000FF);
+	if (AcsType == ACCESSING_FILE_NONEXIST && (Options == FILE_OPEN || Options == FILE_OVERWRITE) && !PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject))
+	{
+		if (!PfpIsFileNameValid(pFileObject->FileName.Buffer, pFileObject->FileName.Length))
+		{
+			iostatus.Status = STATUS_OBJECT_NAME_INVALID;
+		}
+		else
+		{
+			iostatus.Status = STATUS_OBJECT_NAME_NOT_FOUND;
+		}
+		iostatus.Information = 0;
+		goto EXIT;
+	}
 
     //如果文件已经存在 读取文件的内容看看是不是加密的文件
 
@@ -804,6 +826,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
             }
             if(bFirstOpen &&!PfpIsFileEncrypted(&FileFullPath,DeviceObject) && !bFileOurCreated )
             {		
+				//KdPrint(("[Wrench] 第一次打开文件，并不是加密文件：：%wZ\n", &pFileObject->FileName));
                 goto PASSTHROUGH;
             }
         }
@@ -818,7 +841,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
             iostatus.Information	= 0;
             goto EXIT;
         }
-        if(bFileExtInProcessNotSelected  )		//文件不存在并且
+        if(bFileExtInProcessNotSelected)		//文件不存在并且
         {
             goto PASSTHROUGH;
         }
@@ -984,17 +1007,17 @@ PassFromDelayClose:
                 if(((PPfpFCB)(pDiskFileObject->pFCB))->Header.FileSize.QuadPart==0 && ( !bHasFileExt ||!PfpFileExtentionExistInProcInfo(ProcessInfo,szExt)))
                 {
                     //当进程不是强制加密的时候，对不要求加密的文件设置正确的参数
-                    //((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = FALSE;
-                    //((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead   = FALSE;
-                    //pDiskFileObject->bFileNOTEncypted				 = TRUE;
+                    ((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = FALSE;
+                    ((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead   = FALSE;
+                    pDiskFileObject->bFileNOTEncypted				 = TRUE;
                 }
             } 
-			/*if (wcswcs(szExt, tmp)!=NULL)
+			if (ProcessInfo->bForceEncryption)
 			{
-				((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = FALSE;
-				((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead = FALSE;
-				pDiskFileObject->bFileNOTEncypted = TRUE;
-			}*/
+				((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = TRUE;
+				((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead = TRUE;
+				pDiskFileObject->bFileNOTEncypted = FALSE;
+			}
             //if(((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt == FALSE)//~!!!!不加密的文件要把这个文件放到指定的进程列表中去！前面要来用比较
             //{
             //    ExAcquireFastMutex(&ProcessInfo->HandleMutex);
@@ -1008,20 +1031,20 @@ PassFromDelayClose:
             //}
         }
 
-    //    if(bFolderUnderProtect/* && bEncryptForFolder */&& bEncryptFileTypeForFolder== ENCRYPT_TYPES )//!!!!对个人安全文件夹里面的文件如果指定了对指定类型的文件进行加密：当前这个文件的大小是0，
-    //        //文件没有类型，或者不是要求加密的文件类型，那么 就设置为不加密
-    //    {
-    //        if(((PPfpFCB)(pDiskFileObject->pFCB))->Header.FileSize.QuadPart==0 && 
-    //            ( !bHasFileExt ||!IsFileTypeEncryptForFolder(DeviceLetter ,FullPathName,FileFullPath.Length/sizeof(WCHAR),szExt)))
-    //        {
-				//((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = TRUE;
-				//((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead   = TRUE;
-				//pDiskFileObject->bFileNOTEncypted				 = FALSE;
-				///*((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = FALSE;
-				//((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead = FALSE;
-				//pDiskFileObject->bFileNOTEncypted = TRUE;*/
-    //        }
-    //    }
+        if(bFolderUnderProtect/* && bEncryptForFolder */&& bEncryptFileTypeForFolder== ENCRYPT_TYPES )//!!!!对个人安全文件夹里面的文件如果指定了对指定类型的文件进行加密：当前这个文件的大小是0，
+            //文件没有类型，或者不是要求加密的文件类型，那么 就设置为不加密
+        {
+            if(((PPfpFCB)(pDiskFileObject->pFCB))->Header.FileSize.QuadPart==0 && 
+                ( !bHasFileExt ||!IsFileTypeEncryptForFolder(DeviceLetter ,FullPathName,FileFullPath.Length/sizeof(WCHAR),szExt)))
+            {
+				((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = TRUE;
+				((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead   = TRUE;
+				pDiskFileObject->bFileNOTEncypted				 = FALSE;
+				/*((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = FALSE;
+				((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead = FALSE;
+				pDiskFileObject->bFileNOTEncypted = TRUE;*/
+            }
+        }
 	   /* if(pExt->bUsbDevice)
 		{
 			if(((PPfpFCB)(pDiskFileObject->pFCB))->Header.FileSize.QuadPart==0 && ( !IsFileNeedEncryptionForUsb(DeviceObject,bHasFileExt?szExt:NULL)))
@@ -2807,14 +2830,14 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
 			if (!bFirstOPEN)
 			{
 				ppFcbCreated = (PPfpFCB)(*pDiskFileObject)->pFCB;
-				if (!PfpGetProcessInfoForCurProc())
+				/*if (!PfpGetProcessInfoForCurProc())
 				{
 					((PPfpFCB)(*pDiskFileObject)->pFCB)->bNeedEncrypt = TRUE;
 				}
 				else
 				{
 					((PPfpFCB)(*pDiskFileObject)->pFCB)->bNeedEncrypt = FALSE;
-				}
+				}*/
 				//FileAttributes |= ACCESSING_FILE_EXIST_ENCRYPT;
 				ioStatus = PfpOpenExistingFcb(IrpContext,
 					FileObject,
@@ -3115,7 +3138,8 @@ PPROCESSINFO PfpGetProcessInfoForCurProc()
 		if (wcswcs(imageName, tmp) != NULL)
 		{
 			ExFreePool(imageName);
-			//KdPrint(("发现 wpsoffice.exe\r\n"));
+			KdPrint(("发现授信进程\r\n"));
+			//DbgBreakPoint();
 		}
 		else {
 			ExFreePool(imageName);
@@ -3134,12 +3158,12 @@ PPROCESSINFO PfpGetProcessInfoForCurProc()
         RtlCopyMemory(FullPathName,ProcessName.Buffer,ProcessName.Length);
         FullPathName[ProcessName.Length>>1] = L'\0';
 
-        if(!PfpGetHashValueForEXE(FullPathName,ProcessName.Length,pszHashValue ,PROCESSHASHVALULENGTH))
+        /*if(!PfpGetHashValueForEXE(FullPathName,ProcessName.Length,pszHashValue ,PROCESSHASHVALULENGTH))
         {	
 
             ProcessInfo = NULL;
             goto PASSTHROUGH;
-        }		
+        }	*/	
 		//////////////////////////////////////////////////////////////////////////////
 		
 		//memset(pszHashValue, str, PROCESSHASHVALULENGTH); //这里拷贝竟然失败了-------
@@ -4713,6 +4737,7 @@ PfpInitFCBFromEncryptBuffer(
     (PUCHAR)Buffer += sizeof(LONGLONG);
     pFcb->Header.AllocationSize.QuadPart  = *(LONGLONG*)Buffer;
     pFcb->bWriteHead = TRUE;
+	//pFcb->bNeedEncrypt = TRUE;
     return TRUE;
 }
 

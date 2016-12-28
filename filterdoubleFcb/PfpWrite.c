@@ -280,7 +280,7 @@ NTSTATUS PfpCommonWrite(PIRP_CONTEXT irpContext,PIRP Irp)
 		PfpCompleteRequest (&irpContext,&Irp,STATUS_SUCCESS);
 		return STATUS_SUCCESS;
 	}
-
+	//DbgBreakPoint();
 	//if this is a nocache and no pageio 's ;and this file has been opened as cached, we should clear the cached's content from section to avoid 
 	//
 	if (!PagingIo &&(!NonCachedIo) &&!CcCanIWrite(pFileObject,
@@ -290,9 +290,7 @@ NTSTATUS PfpCommonWrite(PIRP_CONTEXT irpContext,PIRP Irp)
 	{
 
 		BOOLEAN Retrying = BooleanFlagOn(irpContext->Flags, IRP_CONTEXT_DEFERRED_WRITE);
-
 		PfpPrePostIrp( irpContext, Irp );
-
 		SetFlag( irpContext->Flags, IRP_CONTEXT_DEFERRED_WRITE );
 		//这里进行写，有写一点写一点的处理
 		CcDeferWrite(   pFileObject,
@@ -1143,7 +1141,7 @@ NTSTATUS PfpCommonWrite(PIRP_CONTEXT irpContext,PIRP Irp)
 					memcpy(szdebug,pSyncBufferEncrypt,88);
 					StartingOffset +=ENCRYPTIONHEADLENGTH;				
 				
-					//KdPrint (("in write %wZ offset %u size %u\n",&pFcb->pDiskFileObject->FullFilePath,(ULONG)StartingOffset,BytesToWrite));
+					KdPrint (("in write %wZ offset %u size %u\n",&pFcb->pDiskFileObject->FullFilePath,(ULONG)StartingOffset,BytesToWrite));
 					if(!bWait && !PagingIoResourceAcquired )
 					{						
 						irpContext->Union.NtfsIoContext->Wait.Async.Resource = NULL;
