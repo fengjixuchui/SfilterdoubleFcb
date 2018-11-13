@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2042
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "filterdoubleFcb.W7", "filterdoubleFcb\filterdoubleFcb.W7.vcxproj", "{6F201E4A-5832-4D2C-8F0B-3BB55986E368}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		W7 checked (PREfast)|Win32 = W7 checked (PREfast)|Win32
+		W7 checked|Win32 = W7 checked|Win32
+		W7 free|Win32 = W7 free|Win32
+		W7LH checked (PREfast)|Win32 = W7LH checked (PREfast)|Win32
+		W7LH checked|Win32 = W7LH checked|Win32
+		W7LH free|Win32 = W7LH free|Win32
+		W7NET checked (PREfast)|Win32 = W7NET checked (PREfast)|Win32
+		W7NET checked|Win32 = W7NET checked|Win32
+		W7NET free|Win32 = W7NET free|Win32
+		W7XP checked (PREfast)|Win32 = W7XP checked (PREfast)|Win32
+		W7XP checked|Win32 = W7XP checked|Win32
+		W7XP free|Win32 = W7XP free|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7 checked (PREfast)|Win32.ActiveCfg = W7 checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7 checked (PREfast)|Win32.Build.0 = W7 checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7 checked (PREfast)|Win32.Deploy.0 = W7 checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7 checked|Win32.ActiveCfg = W7 checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7 checked|Win32.Build.0 = W7 checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7 checked|Win32.Deploy.0 = W7 checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7 free|Win32.ActiveCfg = W7 free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7 free|Win32.Build.0 = W7 free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7 free|Win32.Deploy.0 = W7 free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7LH checked (PREfast)|Win32.ActiveCfg = W7LH checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7LH checked (PREfast)|Win32.Build.0 = W7LH checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7LH checked (PREfast)|Win32.Deploy.0 = W7LH checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7LH checked|Win32.ActiveCfg = W7LH checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7LH checked|Win32.Build.0 = W7LH checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7LH checked|Win32.Deploy.0 = W7LH checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7LH free|Win32.ActiveCfg = W7LH free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7LH free|Win32.Build.0 = W7LH free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7LH free|Win32.Deploy.0 = W7LH free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7NET checked (PREfast)|Win32.ActiveCfg = W7NET checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7NET checked (PREfast)|Win32.Build.0 = W7NET checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7NET checked (PREfast)|Win32.Deploy.0 = W7NET checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7NET checked|Win32.ActiveCfg = W7NET checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7NET checked|Win32.Build.0 = W7NET checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7NET checked|Win32.Deploy.0 = W7NET checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7NET free|Win32.ActiveCfg = W7NET free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7NET free|Win32.Build.0 = W7NET free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7NET free|Win32.Deploy.0 = W7NET free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7XP checked (PREfast)|Win32.ActiveCfg = W7XP checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7XP checked (PREfast)|Win32.Build.0 = W7XP checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7XP checked (PREfast)|Win32.Deploy.0 = W7XP checked (PREfast)|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7XP checked|Win32.ActiveCfg = W7XP checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7XP checked|Win32.Build.0 = W7XP checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7XP checked|Win32.Deploy.0 = W7XP checked|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7XP free|Win32.ActiveCfg = W7XP free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7XP free|Win32.Build.0 = W7XP free|Win32
+		{6F201E4A-5832-4D2C-8F0B-3BB55986E368}.W7XP free|Win32.Deploy.0 = W7XP free|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {305B60F4-1BFD-480B-84EE-7D29EE83FB54}
+	EndGlobalSection
+EndGlobal

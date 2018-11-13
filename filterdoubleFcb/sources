@@ -1,0 +1,67 @@
+C_DEFINES =$(C_DEFINES) -D_WIN2K_COMPAT_SLIST_USAGE 
+TARGETNAME=PfpDrv
+TARGETTYPE=DRIVER
+DRIVERTYPE=FS
+DRIVERBASE= 0x003000000
+
+TARGETLIBS=\
+           $(DDK_LIB_PATH)\ntstrsafe.lib \
+           $(DDK_LIB_PATH)\wdmsec.lib\
+
+
+SOURCES=filespy.c  \
+        fspyLib.c  \
+        fspyCtx.c  \
+        fspyHash.c \
+        fspyTx.c   \
+        PfpFile.c  \
+        PfpRead.c \
+        PfpWrite.c \
+        fastlock.c \
+        fstiosup.c \
+        fastquery.c \
+        pfpcreate.c \
+        resrcsup.c \
+        pfpcleanup.c \
+        strucsup.c \
+        pfpclose.c \
+        pfpFileInfo.c \
+        pfpworkque.c \
+        pfpData.c \
+        pfpdeviosup.c \
+        pfpdisp.c \
+        namelookup.c \
+        pfpcache.c \
+        ea.c       \
+        pfpflush.c \
+        PfpHide.c \
+        ProcNotify.c \
+        PfpConfigSetting.c \
+        PfpProcessInfo.c \
+        PfpBackUpThread.c \
+        Aeskey.c \
+        Aestab.c \
+        Blowfish.c \
+        Cast.c \
+         Des.c \
+        Rmd160.c \
+        Serpent.c \
+        Sha1.c \
+        Sha2.c \
+        Twofish.c \
+        Whirlpool.c \
+        Endian.c \
+        Aescrypt.c \
+        PfpFolderProtect.c \
+        md5.c \
+        log.c \
+        DelayClose.c \
+        PfpUsbDevice.c \
+        PfpVirtualDir.c \
+        PfpUsbSecure.c \
+        DeviceIoControl.c \
+        VerifyKey.c \
+        PfpProcessExclude.c \
+        Fake_function.c \
+        Regfilter.c \
+        filespy.rc

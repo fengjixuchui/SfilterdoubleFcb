@@ -1,0 +1,9 @@
+warnings in directory d:\myproject\filterdoublefcb\filterdoublefcb
+c:\winddk\6000\inc\api\windef.h(57) : warning C4005: 'MAX_PATH' : macro redefinition
+c:\winddk\6000\inc\api\windef.h(123) : warning C4005: 'CALLBACK' : macro redefinition
+c:\winddk\6000\inc\api\windef.h(184) : warning C4142: benign redefinition of type
+c:\winddk\6000\inc\api\windef.h(185) : warning C4142: benign redefinition of type
+c:\winddk\6000\inc\api\windef.h(57) : warning C4005: 'MAX_PATH' : macro redefinition
+c:\winddk\6000\inc\api\windef.h(123) : warning C4005: 'CALLBACK' : macro redefinition
+c:\winddk\6000\inc\api\windef.h(184) : warning C4142: benign redefinition of type
+c:\winddk\6000\inc\api\windef.h(185) : warning C4142: benign redefinition of type

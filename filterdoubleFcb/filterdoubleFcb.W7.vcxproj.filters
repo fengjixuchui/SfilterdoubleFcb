@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b9b57983-2e4f-46f4-9030-c890aae4b659}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;asm;mc</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{ff2c55c4-e952-402a-b6ef-dc6ed2c6c1f0}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{16e3ccd5-c6c1-4745-b905-88d334efb597}</UniqueIdentifier>
+      <Extensions>rc;mc;ico;cur;bmp;dlg;rc2</Extensions>
+    </Filter>
+    <Filter Include="Special Files">
+      <UniqueIdentifier>{876582c4-b16c-43fc-bcd0-18c416da7b7d}</UniqueIdentifier>
+      <Extensions>*</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Aescrypt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Aeskey.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Aestab.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Blowfish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cast.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DelayClose.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Des.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceIoControl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Endian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Fake_function.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fastlock.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fastquery.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filespy.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fspyCtx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fspyHash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fspyLib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fspyTx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fstiosup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="md5.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="namelookup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpBackUpThread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pfpCache.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pfpcleanup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pfpclose.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpConfigSetting.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpCreate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpData.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pfpdeviosup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pfpdisp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpFile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpFileInfo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpFlush.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpFolderProtect.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpHide.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpProcessExclude.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpProcessInfo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpRead.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpUsbDevice.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpUsbSecure.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpVirtualDir.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pfpworkque.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PfpWrite.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcNotify.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegFilter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="resrcsup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rmd160.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Serpent.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sha1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sha2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="strucsup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Twofish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VerifyKey.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Whirlpool.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Aes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Aesopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Aestab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blowfish.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Des.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Endian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fake_function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filespy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fspydef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fspyKern.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LOG - Copy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LOG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MD5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Md5g.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="namelookupdef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PfpCreate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rmd160.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serpent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sha1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sha2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tcdefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Twofish.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="usbsecure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VerifyKey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VMProtectDDK22.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="filespy.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="filterdoubleFcb.vsprops">
+      <Filter>Special Files</Filter>
+    </None>
+    <None Include="makefile">
+      <Filter>Special Files</Filter>
+    </None>
+    <None Include="sources">
+      <Filter>Special Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>
