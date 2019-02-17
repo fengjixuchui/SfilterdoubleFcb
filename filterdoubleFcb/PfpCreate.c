@@ -879,12 +879,12 @@ Process_File:
             if(((PPfpFCB)(pDiskFileObject->pFCB))->Header.FileSize.QuadPart==0 && 
                 ( !bHasFileExt ||!IsFileTypeEncryptForFolder(DeviceLetter ,FullPathName,FileFullPath.Length/sizeof(WCHAR),szExt)))
             {
-				/*((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = TRUE;
+				((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = TRUE;
 				((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead   = TRUE;
-				pDiskFileObject->bFileNOTEncypted				 = FALSE;*/
-				((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = FALSE;
+				pDiskFileObject->bFileNOTEncypted				 = FALSE;
+				/*((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = FALSE;
 				((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead = FALSE;
-				pDiskFileObject->bFileNOTEncypted = TRUE;
+				pDiskFileObject->bFileNOTEncypted = TRUE;*/
             }
         }
         if(pExt->bUsbDevice)
@@ -923,8 +923,9 @@ Try_exit:
     //如果成功了，并且是第一次打开这个文件，那么pDiskFileObject 就是刚创建的，那么就要加到每个spydevice全局的链表里面。
     if(pDiskFileObject && NT_SUCCESS(iostatus.Status) && !bIrpPost)
     {		
-        if(bFirstOpen)
-            PfpAddDiskFileObjectIntoItsVirtualDiskFile(pVirtualDiskFile,pDiskFileObject);
+		if (bFirstOpen) {
+			PfpAddDiskFileObjectIntoItsVirtualDiskFile(pVirtualDiskFile, pDiskFileObject);
+		}
         else 
         {
             pDiskFileObject->bOpeningAfterAllGothroughCleanup = FALSE;
@@ -2666,18 +2667,18 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
         switch(Type)
         {
         case ACCESSING_FILE_EXIST:
-		case ACCESSING_FILE_EXIST_ENCRYPT:
 		{
+			DbgPrint("[Wrench]File exist!");
 			if (!bFirstOPEN)
 			{
 				ppFcbCreated = (PPfpFCB)(*pDiskFileObject)->pFCB;
 				if (!PfpGetProcessInfoForCurProc())
 				{
-					((PPfpFCB)(*pDiskFileObject)->pFCB)->Encryptbyer = TRUE;
+					((PPfpFCB)(*pDiskFileObject)->pFCB)->bNeedEncrypt = TRUE;
 				}
 				else
 				{
-					((PPfpFCB)(*pDiskFileObject)->pFCB)->Encryptbyer = TRUE;
+					((PPfpFCB)(*pDiskFileObject)->pFCB)->bNeedEncrypt = FALSE;
 				}
 				FileAttributes |= ACCESSING_FILE_EXIST_ENCRYPT;
 				ioStatus = PfpOpenExistingFcb(IrpContext,
@@ -2713,6 +2714,8 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
 					DeleteOnClose,
 					SecurityContext,
 					Type);//pass out   and open the file,set the create attribut on the fileobject
+				DbgPrint("[Wrench]创建了我们自己的Fcb Fcb=%08x", (*pDiskFileObject)->pFCB);
+				setpFcb = (*pDiskFileObject)->pFCB;
 				if (!PfpGetProcessInfoForCurProc() )
 				{
 					ppFcbCreated->Encryptbyer = TRUE;

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+<OACRDEFECTCOUNT>1</OACRDEFECTCOUNT>
+<OACRERRORCOUNT>0</OACRERRORCOUNT>
+<DEFECT _seq="1"><SFA><LINE>97</LINE><COLUMN>0</COLUMN><FILENAME>pfpdeviosup.c</FILENAME><FILEPATH>c:\users\wrench\desktop\sfilterdoublefcb\filterdoublefcb\</FILEPATH></SFA><DEFECTCODE>28172</DEFECTCODE><DESCRIPTION>The function 'PfpMapUserBuffer' has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment.</DESCRIPTION><FUNCTION>PfpMapUserBuffer</FUNCTION><FUNCLINE>97</FUNCLINE><PATH/></DEFECT>
+</DEFECTS>

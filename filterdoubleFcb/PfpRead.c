@@ -6,6 +6,17 @@
 #include "fspyKern.h"
 
 
+VOID fack_irp_comnpele(
+	IN PDEVICE_OBJECT DeviceObject ,
+	IN PIRP Irp,
+	IN PVOID content
+  ) {
+	PKEVENT event = (PKEVENT)content;
+	UNREFERENCED_PARAMETER(Irp);
+	UNREFERENCED_PARAMETER(DeviceObject);
+	KeSetEvent(event, IO_NO_INCREMENT, FALSE);
+}
+
 
 NTSTATUS
 PfpRead (
@@ -24,6 +35,8 @@ PfpRead (
 	TOP_LEVEL_CONTEXT			TopLevelContext;
 	PTOP_LEVEL_CONTEXT			ThreadTopLevelContext;
 	PPfpFCB						pFcb =  NULL;
+	KEVENT myevent;
+	//BOOLEAN lockfile = NULL;
 	
 	ntstatus			= STATUS_SUCCESS;
 
@@ -61,13 +74,14 @@ PfpRead (
 
 
 
-	if(!PfpFileObjectHasOurFCB(pFileObject))
+	if(!PfpFileObjectHasOurFCB(pFileObject)) //不是我们的FCB
 		goto PASSTHROUGH;
 	pFcb = (PPfpFCB)pFileObject->FsContext;	
 	//添加图标要用的判断
 	//if (!PfpGetProcessInfoForCurProc())
 	//{
-	//	goto PASSTHROUGH;
+	//	DbgPrint("[Wrench]::PfpRead--有非法进程进入\r\n");
+
 	//}
 
 	ASSERT(!pFcb->bModifiedByOther);
@@ -192,9 +206,34 @@ PASSTHROUGH:
 
 
 	IoSkipCurrentIrpStackLocation(Irp);
-	
+	ntstatus = IoCallDriver(pNextDriver, Irp);
+
+
+	/*IoCopyCurrentIrpStackLocationToNext(Irp);
+	if (lockfile)
+	{
+		pstack->FileObject = ((PPfpFCB)pFileObject)->pDiskFileObject->pDiskFileObjectWriteThrough;
+	}
+	KeInitializeEvent(&myevent, NotificationEvent, FALSE);
+	IoSetCompletionRoutine(Irp,fack_irp_comnpele ,&myevent, TRUE, TRUE, TRUE);
 	ntstatus =IoCallDriver(pNextDriver ,Irp);
-	
+	if (ntstatus == STATUS_PENDING)
+	{
+		KeWaitForSingleObject(&myevent, Executive, KernelMode, FALSE, NULL);
+		ntstatus = STATUS_SUCCESS;
+	}
+	if (lockfile)
+	{
+		if (pstack->FileObject == ((PPfpFCB)pFileObject)->pDiskFileObject->pDiskFileObjectWriteThrough)
+		{
+			DbgPrint("[Wrench]::pfpread--文件对象一样\r\n");
+			pstack->FileObject = pFileObject;
+		}
+		else
+		{
+			DbgPrint("[Wrench]::pfpread--文件对象不一样\r\n");
+		}
+	}*/
 	
 	return ntstatus;
 }
@@ -391,6 +430,9 @@ NTSTATUS - The return status for the operation
 		//  we will turn user noncached writes into cached writes.
 		//
 		//这个是同步缓存，osr都说了，缓存关键同步是fcb的那两个锁
+		//
+
+
 		if (!PagingIo &&
 			NonCachedIo &&
 			(FileObject->SectionObjectPointer->DataSectionObject != NULL))
@@ -863,7 +905,7 @@ NTSTATUS - The return status for the operation
 					NewStart= (ULONG)StartingVbo&(SectorSize - 1);
 					NewEnd  = ((ULONG)StartingVbo+(ULONG)ByteCount+(SectorSize - 1))& ~(SectorSize - 1);
 
-				//	ASSERT(FileObject->SectionObjectPointer == &Scb->NonpagedScb->SegmentObject);
+				    //ASSERT(FileObject->SectionObjectPointer == &Scb->NonpagedScb->SegmentObject);
 					//这里吧 startvbo 转化到前面的与sector对齐的readoffset
 
 					//调用PfpNonCachedIoRead 来实现 sector对齐的方式的读。
@@ -1035,12 +1077,42 @@ NTSTATUS - The return status for the operation
 			// caller never does any I/O to the file, and thus
 			// FileObject->PrivateCacheMap == NULL.
 			//
+			//////////////////////////////////////////////////////////////////////////////////////////////////////
+			//if (FileObject->PrivateCacheMap == NULL&& !PfpGetProcessInfoForCurProc()) //私有缓存为空
+			//{
 
+			//	//DebugTrace( 0, Dbg, ("Initialize cache mapping.\n") );
+			//	DbgPrint("非法进程缓存初始化，切换为磁盘文件对象缓存读取数据\r\n");
+			//	//
+			//	//  Now initialize the cache map.//初始化缓存
+			//	//
+			//	//  Make sure we are serialized with the FileSizes, and
+			//	//  will remove this condition if we abort.
+			//	//
+
+			//	if (!DoingIoAtEof)
+			//	{
+			//		FsRtlLockFsRtlHeader(&pFcb->Header);
+			//		IrpContext->FcbWithPagingExclusive = (PPfpFCB)pFcb;
+			//	}
+
+			//	CcInitializeCacheMap(IrpContext->Fileobject_onDisk,
+			//		(PCC_FILE_SIZES)&pFcb->Header.AllocationSize,
+			//		FALSE,
+			//		&CacheManagerCallbacks,
+			//		IrpContext->Fileobject_onDisk->FsContext);
+			//	//把新的长度内容刷到私有缓存中
+			//	if (!DoingIoAtEof)
+			//	{
+			//		FsRtlUnlockFsRtlHeader(&IrpContext->Fileobject_onDisk->FsContext->Header);
+			//		IrpContext->FcbWithPagingExclusive = NULL;
+			//	}
+
+			//	CcSetReadAheadGranularity(FileObject, READ_AHEAD_GRANULARITY);
+			//}else 
 			if (FileObject->PrivateCacheMap == NULL) //私有缓存为空
 			{
-
 				//DebugTrace( 0, Dbg, ("Initialize cache mapping.\n") );
-
 				//
 				//  Now initialize the cache map.//初始化缓存
 				//
@@ -1074,7 +1146,6 @@ NTSTATUS - The return status for the operation
 			//
 
 			//DebugTrace( 0, Dbg, ("Cached read.\n") );
-
 			if (!FlagOn(IrpContext->MinorFunction, IRP_MN_MDL)) 
 			{
 
@@ -1087,25 +1158,51 @@ NTSTATUS - The return status for the operation
 				//
 				// Now try to do the copy.
 				//
+				//if (!PfpGetProcessInfoForCurProc())
+				//{
+				//	DbgPrint("非法进程读取，切换为磁盘文件对象读取缓存数据\r\n");
 
-				if (!CcCopyRead( FileObject,
-								(PLARGE_INTEGER)&StartingVbo,
-								(ULONG)ByteCount,
-								Wait,
-								SystemBuffer,
-								&Irp->IoStatus )) 
+				//	if (!CcCopyRead(IrpContext->Fileobject_onDisk,
+				//		(PLARGE_INTEGER)&StartingVbo,
+				//		(ULONG)ByteCount,
+				//		Wait,
+				//		SystemBuffer,
+				//		&Irp->IoStatus))
+				//	{
+
+				//		//DebugTrace( 0, Dbg, ("Cached Read could not wait\n") );
+
+				//		try_return(PostIrp = TRUE);
+				//	}
+
+				//	Status = Irp->IoStatus.Status;
+
+				//	ASSERT(NT_SUCCESS(Status));
+
+				//	try_return(Status);
+				//}
+				//else 
+				//如果是非授信进程，这里还需要改改偏移哦
+				if (!CcCopyRead(FileObject,
+					(PLARGE_INTEGER)&StartingVbo,
+					(ULONG)ByteCount,
+					Wait,
+					SystemBuffer,
+					&Irp->IoStatus))
 				{
 
 					//DebugTrace( 0, Dbg, ("Cached Read could not wait\n") );
 
-					try_return( PostIrp = TRUE );
+					try_return(PostIrp = TRUE);
 				}
 
 				Status = Irp->IoStatus.Status;
 
-				ASSERT( NT_SUCCESS( Status ));
+				ASSERT(NT_SUCCESS(Status));
 
-				try_return( Status );
+				try_return(Status);
+				
+				
 			}
 
 			//
@@ -1428,7 +1525,7 @@ PfpNonCachedSyncIoCompleteRead(
 		 
 			if(pBuffer)
 			{	  
-				     if (pNtfsIoContext->rst)
+				     if (PfpGetProcessInfoForCurProc())
 				    {
 						PfpDecryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_den_context);
 						//PfpEncryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_en_context);
@@ -1514,7 +1611,7 @@ PfpNonCachedAsyncIoCompleteRead(
 			{
 				//这里可以加个判断读取的进程是否解密
 				
-				if (pNtfsIoContext->rst)
+				if (PfpGetProcessInfoForCurProc())
 				{
 					PfpDecryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_den_context);
 					KdPrint(("PfpNonCachedAsyncIoCompleteRead--------------DecryptBuffter-------------\r\n"));

@@ -296,18 +296,18 @@ Return Value:
 	{
 		return STATUS_INSUFFICIENT_RESOURCES;
 	}
-	RtlZeroMemory(tmp, (wcslen(L"WPSOFFICE.EXE") + 1) * sizeof(WCHAR));
-	wcscpy(tmp, L"WPSOFFICE.EXE");
+	RtlZeroMemory(tmp, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR));
+	wcscpy(tmp, L"NOTEPAD.EXE");
 	//上面有一部分废代码
 
-	InitData(DriverObject);
-	status = InitSystemRootPath();
-	if (!NT_SUCCESS(status))
-	{
-		//DebugTrace(DEBUG_TRACE_ERROR, ("FileSafe!DriverEntry -> InitSystemRootPath Fail! Status = 0x%08x\n", status));
-		status = STATUS_UNSUCCESSFUL;
-		return status;
-	}
+	//InitData(DriverObject);
+	//status = InitSystemRootPath();
+	//if (!NT_SUCCESS(status))
+	//{
+	//	//DebugTrace(DEBUG_TRACE_ERROR, ("FileSafe!DriverEntry -> InitSystemRootPath Fail! Status = 0x%08x\n", status));
+	//	status = STATUS_UNSUCCESSFUL;
+	//	return status;
+	//}
 
 
 

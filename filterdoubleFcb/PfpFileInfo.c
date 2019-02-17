@@ -4,6 +4,8 @@
 #include "filespy.h"
 #include "fspyKern.h"
 #include "UsbSecure.h"
+
+PPfpFCB				setpFcb;
 NTSTATUS
 PfpQueryInformation (               //  implemented in FileInfo.c
 					 IN PDEVICE_OBJECT VolumeDeviceObject,
@@ -38,14 +40,16 @@ PfpQueryInformation (               //  implemented in FileInfo.c
 	pDeviceExt	= ((PDEVICE_OBJECT)VolumeDeviceObject)->DeviceExtension;
 	pNextDevice = pDeviceExt ->NLExtHeader.AttachedToDeviceObject;
 	pFileObject = IoGetCurrentIrpStackLocation(Irp)->FileObject;
-	 
+
+
 
 	FsRtlEnterFileSystem();
+
 
 	//
 	//Check to see if the irp is coming form shadowdevice.
 	//
-	if( pDeviceExt->bShadow )
+	if (pDeviceExt->bShadow)
 	{
 		pNextDevice = ((PFILESPY_DEVICE_EXTENSION)(pDeviceExt->pRealDevice->DeviceExtension))->NLExtHeader.AttachedToDeviceObject;
 		goto BYPASS;
@@ -54,13 +58,27 @@ PfpQueryInformation (               //  implemented in FileInfo.c
 	//
 	// Check to see if the fileobject of current irp is recorded by us
 	//
-
+	//if (pFileObject->FsContext == setpFcb)
+	//{
+	//	DbgPrint("[Wrench]find my fcb!");
+	//	DbgBreakPoint();
+	//}
 	
 	
-	if(!PfpFileObjectHasOurFCB(pFileObject))
+	if (!PfpFileObjectHasOurFCB(pFileObject)) {
 		goto BYPASS;
+	}
+		
 	
 	pFcb = (PPfpFCB)pFileObject->FsContext;
+	/*if (!PfpGetProcessInfoForCurProc())
+	{
+		DbgPrint("PfpQueryInformation有非法进程进入\r\n");
+		if (!pFcb->bNeedEncrypt)
+		{
+			goto BYPASS;
+		}
+	}*/
 
 	ASSERT(pFcb->pDiskFileObject);
 	pDiskFileObjs = pFcb->pDiskFileObject;
@@ -1271,6 +1289,9 @@ PfpCommonQueryInformation (
 	pUserFileObject = IrpContext->Fileobject_onDisk;
 
 	OpenById   = FlagOn( Fcb->CCBFlags, CCB_FLAG_OPEN_BY_FILE_ID )?TRUE:FALSE;
+
+	DbgPrint("[Wrench]::PfpCommonQueryInformation\r\n");
+
 	try 
 	{
 		//
@@ -1315,7 +1336,7 @@ PfpCommonQueryInformation (
 		//  more cleanly with the exception mechanism rather than
 		//  testing a return status value for each call.
 		//
-
+		DbgBreakPoint();
 		switch (FileInformationClass) 
 		{
 
@@ -1346,8 +1367,10 @@ PfpCommonQueryInformation (
 										  );				
 
 				AllInfo->StandardInformation.EndOfFile.QuadPart = Fcb->Header.FileSize.QuadPart;				
-				AllInfo->StandardInformation.AllocationSize.QuadPart=Fcb->Header.AllocationSize.QuadPart; 
-				
+				AllInfo->StandardInformation.AllocationSize.QuadPart=Fcb->Header.AllocationSize.QuadPart;
+				DbgPrint("[Wrench]::FileAllInformation--FCB EndOfFile %08x\r\n",Fcb->Header.FileSize.QuadPart);
+				DbgPrint("[Wrench]::FileAllInformation--FCB AllocationSize %08x\r\n",Fcb->Header.AllocationSize.QuadPart);
+				//What? 这里没有写当前FCB的长度
 				AllInfo->PositionInformation.CurrentByteOffset = FileObject->CurrentByteOffset;
 				
 				AllInfo->BasicInformation.CreationTime.QuadPart   = Fcb->CreationTime  ;
@@ -1365,6 +1388,19 @@ PfpCommonQueryInformation (
 
 			case FileBasicInformation:
 			case FileStandardInformation:
+		    //这里应该写非授信进程fcb获取的长度
+				DbgPrint("[Wrench]::FileStandardInformation\r\n");
+			if (!PfpGetProcessInfoForCurProc())
+            {
+		        DbgPrint("PfpQueryInformation有非授信进程进入\r\n");
+				Status = PfpQueryFileInfo(IrpContext,
+					  pUserFileObject,
+					  Fcb,
+					  FileInformationClass
+				 );
+				DbgPrint("[Wrench]::FileStandardInformation--FCB EndOfFile %08x\r\n", Fcb->Header.FileSize.QuadPart);
+				DbgPrint("[Wrench]::FileStandardInformation--FCB AllocationSize %08x\r\n", Fcb->Header.AllocationSize.QuadPart);
+	        }
 			case FileInternalInformation:
 			case FileEaInformation:
 			case FilePositionInformation:

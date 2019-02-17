@@ -1740,7 +1740,7 @@ typedef struct _DISKFILEOBEJECT
 	LIST_ENTRY		UserFileObjList;		// USERFILEOBJECT 的链表 usermode 传递过来的文件对象，可以有多个打开的usermode的文件对象
 	ERESOURCE		UserObjectResource;
 	LONG			nReferenceCount;		//跟踪磁盘文件打开的被引用的次数
-	PFILE_OBJECT	pDiskFileObjectWriteThrough;		//对应于usermode 在磁盘上打开的 实际的文件对象
+	PFILE_OBJECT	pDiskFileObjectWriteThrough;		//对应于usermode 在磁盘上打开的 实际的文件对象 可以说是映射关系
 	HANDLE			hFileWriteThrough	;				//打开的磁盘上的文件的句柄：主要是内核中使用ntcreatefile NTReadFile 时候使用的
 	PDEVICE_OBJECT	pOurSpyDevice;
 	PVOID			pFCB;
@@ -5074,6 +5074,8 @@ CAPTURE_REGISTRY_MANAGER g_RegistrContext;
 NTSTATUS RegistryCallback(IN PVOID CallbackContext, IN PVOID Argument1, IN PVOID Argument2);
 BOOLEAN GetRegistryObjectCompleteName(PUNICODE_STRING pRegistryPath, PUNICODE_STRING pPartialRegistryPath, PVOID pRegistryObject);
 BOOLEAN QueueRegistryEvent(PREGISTRY_EVENT pRegistryEvent);
+
+extern PPfpFCB				setpFcb;
 
 BOOLEAN IsProtectedRegisterKey(PUNICODE_STRING pRegisterPath);
 //register releated functions

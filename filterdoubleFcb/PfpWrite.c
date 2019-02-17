@@ -124,7 +124,7 @@ PfpWrite (
 
 						//ASSERT(pUserFileobject );
 
-						Irp_Context->Fileobject_onDisk = pDiskFileObject->pDiskFileObjectWriteThrough;//用户层的文件对象
+						Irp_Context->Fileobject_onDisk = pDiskFileObject->pDiskFileObjectWriteThrough;//用户层的文件对象对应的磁盘文件对象
 						Irp_Context->pNextDevice	   = pNextDriver;
 
 						if(pstack->MinorFunction & IRP_MN_COMPLETE)
@@ -197,6 +197,7 @@ RETURNED:
 PASSTHROUGH:
 	
 	IoSkipCurrentIrpStackLocation(Irp);
+
 	ntstatus = IoCallDriver(pNextDriver ,Irp);
 
 
