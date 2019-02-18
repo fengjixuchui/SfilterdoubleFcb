@@ -1336,7 +1336,7 @@ PfpCommonQueryInformation (
 		//  more cleanly with the exception mechanism rather than
 		//  testing a return status value for each call.
 		//
-		DbgBreakPoint();
+		//DbgBreakPoint();
 		switch (FileInformationClass) 
 		{
 
@@ -1387,6 +1387,8 @@ PfpCommonQueryInformation (
 				break;
 
 			case FileBasicInformation:
+				DbgPrint("[Wrench]::FileBasicInformation\r\n");
+				break;
 			case FileStandardInformation:
 		    //这里应该写非授信进程fcb获取的长度
 				DbgPrint("[Wrench]::FileStandardInformation\r\n");
@@ -1401,13 +1403,24 @@ PfpCommonQueryInformation (
 				DbgPrint("[Wrench]::FileStandardInformation--FCB EndOfFile %08x\r\n", Fcb->Header.FileSize.QuadPart);
 				DbgPrint("[Wrench]::FileStandardInformation--FCB AllocationSize %08x\r\n", Fcb->Header.AllocationSize.QuadPart);
 	        }
+			break;
 			case FileInternalInformation:
+				DbgPrint("[Wrench]::FileInternalInformation\r\n");
+				break;
 			case FileEaInformation:
+				DbgPrint("[Wrench]::FileEaInformation\r\n");
+				break;
 			case FilePositionInformation:
+				DbgPrint("[Wrench]::FilePositionInformation\r\n");
+				break;
 			case FileStreamInformation:
+				DbgPrint("[Wrench]::FilePositionInformation\r\n");
+				break;
 			case FileCompressionInformation:
+				DbgPrint("[Wrench]::FileCompressionInformation\r\n");
+				break;
 			case FileNetworkOpenInformation:	
-			
+				DbgPrint("[Wrench]::FileNetworkOpenInformation\r\n");
 				//VirtualizerStart();
 				Status = PfpQueryFileInfo(	IrpContext,
 											pUserFileObject,
@@ -1459,12 +1472,16 @@ PfpCommonQueryInformation (
 				break;
 
 			case FileNameInformation:
+				DbgPrint("[Wrench]::FileNameInformation\r\n");
+				break;
 			case FileAlternateNameInformation:
+				DbgPrint("[Wrench]::FileAlternateNameInformation\r\n");
+				break;
 			case FileAttributeTagInformation:
 				//
 				//  This is illegal for the open by Id case.
 				//
-
+				DbgPrint("[Wrench]::FileAttributeTagInformation\r\n");
 				if (OpenById) 
 				{
 

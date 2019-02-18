@@ -192,7 +192,7 @@ pfpCreateProcessNotify(
 					goto DONE;
 
 				ExAcquireResourceExclusiveLite(&g_ProcessInfoResource,TRUE);
-				PfpAddProcessIntoGlobal(pProcessInfoChild );
+				PfpAddProcessIntoGlobal(pProcessInfoChild);
 				ExReleaseResourceLite(&g_ProcessInfoResource);
 
 DONE:

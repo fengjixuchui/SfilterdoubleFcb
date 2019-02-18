@@ -102,7 +102,6 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 
 
     pAttachedDevice  = pExt->NLExtHeader.AttachedToDeviceObject;
-
     if(g_ourProcessHandle== PsGetCurrentProcessId())
         goto PASSTHROUGH;
 
@@ -158,6 +157,11 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
     // 		
     // 	}
 
+
+
+
+
+
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //对于 我们创建的真实目录而言 其下面的所有文件和文件夹都是只读的。
@@ -167,23 +171,29 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
     //4：是否是打开的虚拟目录下面的目录？
     //5:是否是打开虚拟目录下面的文件？
     //得到 要访问的文件的全路径
-    if(!NT_SUCCESS(ntstatus = PfpGetFullPathPreCreate(Irp,&FullPathName,&lFullPathLenInBytes,DeviceObject)))
-    {
-        if(!PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject))
-        {
-            goto PASSTHROUGH;
-        }
-        else
-        {
-            iostatus.Status			= ntstatus;
-            iostatus.Information	= 0;
-            goto EXIT;
-        }
-    }
-    if(wcsstr(FullPathName,L"WINDOWS\\System32\\Msimtf.dll")!=NULL ||wcsstr(FullPathName,L"WINDOWS\\System32\\msimtf.dll")!=NULL )
+	if (!NT_SUCCESS(ntstatus = PfpGetFullPathPreCreate(Irp, &FullPathName, &lFullPathLenInBytes, DeviceObject)))
+	{
+		//if (!PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject))
+		//{
+		//	DbgPrint("父路径PASS\r\n");
+		//	goto PASSTHROUGH;
+		//}
+		//else
+		//{
+		//	iostatus.Status = ntstatus;
+		//	iostatus.Information = 0;
+		//	goto EXIT;
+		//}
+		if (FullPathName == NULL)
+		{
+			DbgPrint("FullPathName为NULL\r\n");
+			goto PASSTHROUGH;
+		}
+	}
+   /* if(wcsstr(FullPathName,L"WINDOWS\\System32\\Msimtf.dll")!=NULL ||wcsstr(FullPathName,L"WINDOWS\\System32\\msimtf.dll")!=NULL )
     {
         KdPrint (("\r\n"));
-    }
+    }*/
     bOpenFileStream = PfpIsStreamPath(FullPathName,lFullPathLenInBytes);
 
     FileFullPath.Buffer = FullPathName;
@@ -193,263 +203,259 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
     //文件名长度为零 或者 这个访问的对象是分区根目录，那么直接Pass 给下层的驱动执行
     if(FileFullPath.Length ==0 || (FileFullPath.Length==2 && FileFullPath.Buffer[0]==L'\\'))
     {
+		DbgPrint("[Wrench]FullPathName为0这个访问的对象是分区根目录\r\n");
         goto PASSTHROUGH;
     }
 
     //!!!!!!!!!!!!!!!!!!
     //这里处理的是usb的全盘加密//并且这个时候系统已经登录进来了
-    if(pExt->bUsbDevice)
-    {
-        //对于USB上的文件，只有在加密系统登录后并且加密加密系统是要求加密的，并且打开的是文件本身或者文件的 DATA数据流，我们才进行加密处理
-        if(FileFullPath.Buffer[(FileFullPath.Length>>1)-1]==L'\\')
-        {
-            goto PASSTHROUGH;
-        }
+    //if(pExt->bUsbDevice)
+    //{
+    //    //对于USB上的文件，只有在加密系统登录后并且加密加密系统是要求加密的，并且打开的是文件本身或者文件的 DATA数据流，我们才进行加密处理
+    //    if(FileFullPath.Buffer[(FileFullPath.Length>>1)-1]==L'\\')
+    //    {
+    //        goto PASSTHROUGH;
+    //    }
 
-        if(IsOpenDirectory(pstack->Flags)||IsDirectory(pstack->Parameters.Create.Options))
-        {
-            goto PASSTHROUGH;
-        }
-        if(ExeHasLoggon!=0 && IsUsbDeviceNeedEncryption(DeviceObject) && !bOpenFileStream)
-        {
-            bFolderUnderProtect = TRUE;
-            bEncryptForFolder   = TRUE;
-            bEncryptFileTypeForFolder = ENCRYPT_ALL;
-            goto FOLDERANDNOFOLDER;
-        }		 
-        goto PASSTHROUGH;//对于加密USB 上的 非DATA的文件流，我们不进行任何处理
+    //    if(IsOpenDirectory(pstack->Flags)||IsDirectory(pstack->Parameters.Create.Options))
+    //    {
+    //        goto PASSTHROUGH;
+    //    }
+    //    if(ExeHasLoggon!=0 && IsUsbDeviceNeedEncryption(DeviceObject) && !bOpenFileStream)
+    //    {
+    //        bFolderUnderProtect = TRUE;
+    //        bEncryptForFolder   = TRUE;
+    //        bEncryptFileTypeForFolder = ENCRYPT_ALL;
+    //        goto FOLDERANDNOFOLDER;
+    //    }		 
+    //    goto PASSTHROUGH;//对于加密USB 上的 非DATA的文件流，我们不进行任何处理
 
-    }
-    if(bHasFileExt && exLenght== 3*sizeof(WCHAR) &&_wcsnicmp(szExt,L"DOC",3)==0)
-    {
-        iostatus.Status			= STATUS_SUCCESS;
-        iostatus.Information	= 0;
-    }
-
+    //}
+    //if(bHasFileExt && exLenght== 3*sizeof(WCHAR) &&_wcsnicmp(szExt,L"DOC",3)==0)
+    //{
+    //    iostatus.Status			= STATUS_SUCCESS;
+    //    iostatus.Information	= 0;
+    //}
     //!!!!!!!!!!!!!!!!!
     //这里处理的是父的fileobject是我们的！直接往下继续处理
 	//判断已经打开的文件对象的FCB，看看是不是我们的头
-    if(PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject))
-    {
-        if(bOpenFileStream)
-        {
-            pFileObject->RelatedFileObject = NULL;
-            if(pFileObject->FileName.Buffer)
-            {
-                ExFreePool(pFileObject->FileName.Buffer);				
-            }
-            pFileObject->FileName.Buffer = ExAllocatePool(PagedPool,2+lFullPathLenInBytes);
-            pFileObject->FileName.Length = (USHORT)lFullPathLenInBytes;
-            pFileObject->FileName.MaximumLength = ( (USHORT)lFullPathLenInBytes +2);
+  //  if(PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject))
+  //  {
+  //      if(bOpenFileStream)
+  //      {
+  //          pFileObject->RelatedFileObject = NULL;
+  //          if(pFileObject->FileName.Buffer)
+  //          {
+  //              ExFreePool(pFileObject->FileName.Buffer);				
+  //          }
+  //          pFileObject->FileName.Buffer = ExAllocatePool(PagedPool,2+lFullPathLenInBytes);
+  //          pFileObject->FileName.Length = (USHORT)lFullPathLenInBytes;
+  //          pFileObject->FileName.MaximumLength = ( (USHORT)lFullPathLenInBytes +2);
 
-            memcpy(pFileObject->FileName.Buffer,FullPathName, lFullPathLenInBytes );
-            pFileObject->FileName.Buffer[lFullPathLenInBytes >>1] =L'\0';
-            goto PASSTHROUGH;
-        }else
-        {
-            pVirtualDiskFile = ((PPfpFCB)pFileObject->RelatedFileObject->FsContext)->pDiskFileObject->pVirtualDiskFile;
-            bPareseCompleted    = TRUE;
-            bFolderUnderProtect = TRUE;
-            ExAcquireResourceExclusiveLite(pParentRootDir->AccssLocker,TRUE);
-            ExAcquireResourceExclusiveLite(pVirtualDiskFile->pVirtualDiskLocker,TRUE );
-            pDeviceResouce = pParentRootDir->AccssLocker;
-            pVirtualFileResouce  = pVirtualDiskFile->pVirtualDiskLocker;
-            //KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
-            pDiskFileObject = ((PPfpFCB)pFileObject->RelatedFileObject->FsContext)->pDiskFileObject;
-            goto FOLDERANDNOFOLDER;
-        }
+  //          memcpy(pFileObject->FileName.Buffer,FullPathName, lFullPathLenInBytes );
+  //          pFileObject->FileName.Buffer[lFullPathLenInBytes >>1] =L'\0';
+  //          goto PASSTHROUGH;
+  //      }else
+  //      {
+  //          pVirtualDiskFile = ((PPfpFCB)pFileObject->RelatedFileObject->FsContext)->pDiskFileObject->pVirtualDiskFile;
+  //          bPareseCompleted    = TRUE;
+  //          bFolderUnderProtect = TRUE;
+  //          ExAcquireResourceExclusiveLite(pParentRootDir->AccssLocker,TRUE);
+  //          ExAcquireResourceExclusiveLite(pVirtualDiskFile->pVirtualDiskLocker,TRUE );
+  //          pDeviceResouce = pParentRootDir->AccssLocker;
+  //          pVirtualFileResouce  = pVirtualDiskFile->pVirtualDiskLocker;
+  //          //KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
+  //          pDiskFileObject = ((PPfpFCB)pFileObject->RelatedFileObject->FsContext)->pDiskFileObject;
+  //          goto FOLDERANDNOFOLDER;
+  //      }
 
-    }
-
-
-
-    //////VirtualizerStart();
-    bFolderUnderProtect =GetFolderProtectProperty(DeviceLetter ,
-        FullPathName,
-        FileFullPath.Length>>1,
-        &ProtectTypeForFolder,
-        &bEncryptForFolder,
-        &bBackupForFolder,
-        &bFolderLocked,
-        &bEncryptFileTypeForFolder);
-    //////VirtualizerEnd();
-    //如果是系统没有运行 那么就不考虑来并且 当前访问的目录或者文件 不再安全文件夹中
-    if( !ExeHasLoggon && !bFolderUnderProtect)
-    {
-        goto PASSTHROUGH;
-    }
-
-    if(bFolderUnderProtect)//说明 这个文件是在个人安全文件夹的 下面
-    {
-        //1: 个人安全文件夹
-        if(bFolderLocked||(ExeHasLoggon==0) )//文件夹的功能 在锁定状态 任何访问都会拒绝
-        {
-            //1:文件夹锁定 或者 用户没有登录
-            iostatus.Status = STATUS_ACCESS_DENIED;
-            iostatus.Information = 0;
-            goto EXIT;
-        }else 
-        {//2: 文件夹解锁并且用户登录
-
-            if(IsOpenDirectory(pstack->Flags)||IsDirectory(pstack->Parameters.Create.Options))
-            {
-                goto PASSTHROUGH;
-            }
-            if((FileFullPath.Buffer[(FileFullPath.Length>>1)-1]==L'\\') || bEncryptFileTypeForFolder== ENCRYPT_NONE )//如果个人安全文件夹在解锁 状态，并且不是要求加密的那么直接pass，允许对这个个人文件的child 进行任何操作
-            {
-                goto PASSTHROUGH;//直接pass了
-            }
-            if(bOpenFileStream)
-            {
-                goto PASSTHROUGH;	
-            }
-
-            //下面主要对Create里面Param的Option做点快速的处理
-            {
-                //FILE_OPEN_REPARSE_POINT 是处理应用程序自己定义的数据，加密驱动里面没必要多它的这个数据进行加密
-                if(pstack->Parameters.Create.Options&FILE_OPEN_REPARSE_POINT)
-                {
-                    goto PASSTHROUGH;
-                }
-
-            }//end of  //下面主要对Create里面Param的Option做点快速的处理
-            goto FOLDERANDNOFOLDER; //剩下的就是解锁下的要求加解密的 访问个人安全文件夹下的 child
-            //开锁状态下，并且 没有必要得到当前的进程吧
-        }
-    }else //2：不是个人安全文件夹
-    {
-
-        if(bHasFileExt && exLenght== 3*sizeof(WCHAR) &&_wcsnicmp(szExt,L"TXT",3)==0)
-        {
-            iostatus.Status			= STATUS_SUCCESS;
-            iostatus.Information	= 0;
-        }
-        if(!ExeHasLoggon)//没有登录
-        {
-            goto PASSTHROUGH;
-        }
-        //处理登录的情况
-        if(IsOpenDirectory(pstack->Flags)||IsDirectory(pstack->Parameters.Create.Options))
-        {
-            goto PASSTHROUGH;
-        }
-        if((FileFullPath.Buffer[(FileFullPath.Length>>1)-1]==L'\\') /*||PfpFindExcludProcess(PsGetProcessId(IoGetCurrentProcess() ))*/)
-        {
-            goto PASSTHROUGH;
-        }
-        if(bOpenFileStream)
-        {
-            goto PASSTHROUGH;	
-        }
-    }
+  //  }
 
 
 
+  //  //////VirtualizerStart();
+  //  bFolderUnderProtect =GetFolderProtectProperty(DeviceLetter ,
+  //      FullPathName,
+  //      FileFullPath.Length>>1,
+  //      &ProtectTypeForFolder,
+  //      &bEncryptForFolder,
+  //      &bBackupForFolder,
+  //      &bFolderLocked,
+  //      &bEncryptFileTypeForFolder);
+  //  //////VirtualizerEnd();
+  //  //如果是系统没有运行 那么就不考虑来并且 当前访问的目录或者文件 不再安全文件夹中
+  //  if( !ExeHasLoggon && !bFolderUnderProtect)
+  //  {
+  //      goto PASSTHROUGH;
+  //  }
+
+  //  if(bFolderUnderProtect)//说明 这个文件是在个人安全文件夹的 下面
+  //  {
+  //      //1: 个人安全文件夹
+  //      if(bFolderLocked||(ExeHasLoggon==0) )//文件夹的功能 在锁定状态 任何访问都会拒绝
+  //      {
+  //          //1:文件夹锁定 或者 用户没有登录
+  //          iostatus.Status = STATUS_ACCESS_DENIED;
+  //          iostatus.Information = 0;
+  //          goto EXIT;
+  //      }else 
+  //      {//2: 文件夹解锁并且用户登录
+
+  //          if(IsOpenDirectory(pstack->Flags)||IsDirectory(pstack->Parameters.Create.Options))
+  //          {
+  //              goto PASSTHROUGH;
+  //          }
+  //          if((FileFullPath.Buffer[(FileFullPath.Length>>1)-1]==L'\\') || bEncryptFileTypeForFolder== ENCRYPT_NONE )//如果个人安全文件夹在解锁 状态，并且不是要求加密的那么直接pass，允许对这个个人文件的child 进行任何操作
+  //          {
+  //              goto PASSTHROUGH;//直接pass了
+  //          }
+  //          if(bOpenFileStream)
+  //          {
+  //              goto PASSTHROUGH;	
+  //          }
+
+  //          //下面主要对Create里面Param的Option做点快速的处理
+  //          {
+  //              //FILE_OPEN_REPARSE_POINT 是处理应用程序自己定义的数据，加密驱动里面没必要多它的这个数据进行加密
+  //              if(pstack->Parameters.Create.Options&FILE_OPEN_REPARSE_POINT)
+  //              {
+  //                  goto PASSTHROUGH;
+  //              }
+
+  //          }//end of  //下面主要对Create里面Param的Option做点快速的处理
+  //          goto FOLDERANDNOFOLDER; //剩下的就是解锁下的要求加解密的 访问个人安全文件夹下的 child
+  //          //开锁状态下，并且 没有必要得到当前的进程吧
+  //      }
+  //  }else //2：不是个人安全文件夹
+  //  {
+
+		///*if(bHasFileExt && exLenght== 3*sizeof(WCHAR) &&_wcsnicmp(szExt,L"TXT",3)==0)
+		//{
+		//	iostatus.Status			= STATUS_SUCCESS;
+		//	iostatus.Information	= 0;
+		//}*/
+  //      if(!ExeHasLoggon)//没有登录
+  //      {
+  //          goto PASSTHROUGH;
+  //      }
+  //      //处理登录的情况
+  //      if(IsOpenDirectory(pstack->Flags)||IsDirectory(pstack->Parameters.Create.Options))
+  //      {
+  //          goto PASSTHROUGH;
+  //      }
+  //      if((FileFullPath.Buffer[(FileFullPath.Length>>1)-1]==L'\\') /*||PfpFindExcludProcess(PsGetProcessId(IoGetCurrentProcess() ))*/)
+  //      {
+  //          goto PASSTHROUGH;
+  //      }
+  //      if(bOpenFileStream)
+  //      {
+  //          goto PASSTHROUGH;	
+  //      }
+  //  }
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
-
     //KdPrint(((procdess id )));
     // 	if(	PfpFindExcludProcess(PsGetProcessId(IoGetCurrentProcess() )	))
     // 	{	//这个进程是被排除的进程，这里提前跳出
     // 		goto PASSTHROUGH;
     // 	}
 
-    pDeviceResouce = pParentRootDir->AccssLocker;
-    ExAcquireResourceExclusiveLite(pDeviceResouce,TRUE );
-    pParentDir  = PfpPareseToDirObject(pParentRootDir,FullPathName,&pRemainer,&bPareseCompleted);
+    //pDeviceResouce = pParentRootDir->AccssLocker;
+    //ExAcquireResourceExclusiveLite(pDeviceResouce,TRUE );
+    //pParentDir  = PfpPareseToDirObject(pParentRootDir,FullPathName,&pRemainer,&bPareseCompleted);
 
-    //ASSERT((pParentDir  == pParentRootDir)?bPareseCompleted:TRUE);
-    if(!bPareseCompleted)
-    {
-        ExReleaseResourceLite(pDeviceResouce);
-        pDeviceResouce = NULL;
-        pParentDir = NULL;
-        pRemainer = NULL;
-    }else
-    {
-        //找到父目录
-        UNICODE_STRING TempString;
+    ////ASSERT((pParentDir  == pParentRootDir)?bPareseCompleted:TRUE);
+    //if(!bPareseCompleted)
+    //{
+    //    ExReleaseResourceLite(pDeviceResouce);
+    //    pDeviceResouce = NULL;
+    //    pParentDir = NULL;
+    //    pRemainer = NULL;
+    //}else
+    //{
+    //    //找到父目录
+    //    UNICODE_STRING TempString;
 
-        //////VirtualizerStart();
-        TempString.Buffer = pRemainer;
-        TempString.Length =  (USHORT)(lFullPathLenInBytes-(ULONG)((PUCHAR)pRemainer-(PUCHAR)FullPathName));
-        TempString.MaximumLength  = TempString.Length +2;
-        pVirtualDiskFile = PfpFindVirtualDiskFileObjectInParent(pParentDir,&TempString);
-        if(pVirtualDiskFile)
-        {
-            pVirtualFileResouce		= pVirtualDiskFile->pVirtualDiskLocker;
-            ExAcquireResourceExclusiveLite(pVirtualFileResouce,TRUE);
-            //KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
-        }
-        //////VirtualizerEnd();
-    }
-    if(bHasFileExt && exLenght== 3*sizeof(WCHAR) &&_wcsnicmp(szExt,L"TXT",3)==0)
-    {
-        iostatus.Status			= STATUS_SUCCESS;
-        iostatus.Information	= 0;
-    }
-    if(IsFileTypeBelongExeType(szExt)||!PfpIsThereValidProcessInfo()||(ProcessInfo= (IrpContext?IrpContext->pProcessInfo:PfpGetProcessInfoForCurProc()))	== NULL|| !ProcessInfo->bEnableEncrypt)//没有找到这个对应的程序 ，或者 这个程序当前是禁止加密的
-    {		
-        //处理3种情况：对当前打开文件的请求
-        //1：是exe类型的文件！系统不会加密
-        //2: 当前的进程不是加密进程！
-        //3: 当前的进程被禁止加密了！
-        //处理方法是！ 关闭我们对这个文件的打开的记录，给系统继续处理这个打开文件的请求
-
-        //2: 从DiskFileObject 的队列里面关闭并且删除 系统延迟关闭的文件（MM有时候对打开的文件采取延迟关闭的算法）
-        if(pVirtualDiskFile)
-        {
-            PDISKFILEOBJECT pDiskFile ;
-            pDiskFile = PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile );
-            if(pDiskFile )
-            {
-                PfpCloseFileHasGoThroughCleanupAndNotUsed(pDiskFile);//!!!!!!!!!!!!!!!这里好像没有存在的必要把难道是 exe文件 我们创建了并且要关闭？
-            }
-        }
-        if(bHasFileExt && 
-            _wcsicmp(szExt,L"EXE")==0 && 
-            ((ProcessInfo= (IrpContext?IrpContext->pProcessInfo:PfpGetProcessInfoForCurProc()))!= NULL) && 
-            ProcessInfo->bBowser && 
-            !ProcessInfo->bAllCreateExeFile)
-        {
-            AcsType	= PfpGetFileAttriForRequestEx(DeviceObject,FullPathName,lFullPathLenInBytes,&FilesizeForExistFile);
-            if(AcsType	== ACCESSING_FILE_NONEXIST )
-            {
-                Options = pstack->Parameters.Create.Options;
-                Options = ((Options>> 24) & 0x000000FF);
-                if(Options ==FILE_OPEN_IF || Options ==FILE_CREATE||FILE_OVERWRITE==Options)
-                {
-                    iostatus.Status			= STATUS_ACCESS_DENIED;
-                    iostatus.Information	= 0;
-                    goto EXIT;
-                }				
-			}
-			else {
-				/*((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = FALSE;
-				((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead = FALSE;
-				pDiskFileObject->bFileNOTEncypted = TRUE;*/
-			}
-        }
-
-        goto PASSTHROUGH;
-    }
-    if(bHasFileExt && exLenght== 3*sizeof(WCHAR) &&_wcsnicmp(szExt,L"TXT",3)==0)
-    {
-        iostatus.Status			= STATUS_SUCCESS;
-        iostatus.Information	= 0;
-    }
-    if(!ProcessInfo->bBowser)//不是浏览器的情况
-    {
-        bFileExtInProcessNotSelected = (bHasFileExt && PfpFileExtentionExistInProcInfoNotSelete(ProcessInfo,szExt));
-    }else//是浏览器的情况，那么对没有后缀的或者是没有包括的文件类型的文件一律不管
-    {
-        if(!bHasFileExt ||  !PfpFileExtentionExistInProcInfo(ProcessInfo,szExt))// 没有文件后缀或者没有设置过的类型的文件
-        {
-            goto PASSTHROUGH;// PASS 掉！ 不处理
-        }
-    }
+    //    //////VirtualizerStart();
+    //    TempString.Buffer = pRemainer;
+    //    TempString.Length =  (USHORT)(lFullPathLenInBytes-(ULONG)((PUCHAR)pRemainer-(PUCHAR)FullPathName));
+    //    TempString.MaximumLength  = TempString.Length +2;
+    //    pVirtualDiskFile = PfpFindVirtualDiskFileObjectInParent(pParentDir,&TempString);
+    //    if(pVirtualDiskFile)
+    //    {
+    //        pVirtualFileResouce		= pVirtualDiskFile->pVirtualDiskLocker;
+    //        ExAcquireResourceExclusiveLite(pVirtualFileResouce,TRUE);
+    //        //KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
+    //    }
+    //    //////VirtualizerEnd();
+    //}
 
 
+  //  if(IsFileTypeBelongExeType(szExt)||!PfpIsThereValidProcessInfo()||(ProcessInfo= (IrpContext?IrpContext->pProcessInfo:PfpGetProcessInfoForCurProc()))	== NULL|| !ProcessInfo->bEnableEncrypt)//没有找到这个对应的程序 ，或者 这个程序当前是禁止加密的
+  //  {		
+  //      //处理3种情况：对当前打开文件的请求
+  //      //1：是exe类型的文件！系统不会加密
+  //      //2: 当前的进程不是加密进程！
+  //      //3: 当前的进程被禁止加密了！
+  //      //处理方法是！ 关闭我们对这个文件的打开的记录，给系统继续处理这个打开文件的请求
+
+  //      //2: 从DiskFileObject 的队列里面关闭并且删除 系统延迟关闭的文件（MM有时候对打开的文件采取延迟关闭的算法）
+  //      if(pVirtualDiskFile)
+  //      {
+  //          PDISKFILEOBJECT pDiskFile ;
+  //          pDiskFile = PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile );
+  //          if(pDiskFile )
+  //          {
+  //              PfpCloseFileHasGoThroughCleanupAndNotUsed(pDiskFile);//!!!!!!!!!!!!!!!这里好像没有存在的必要把难道是 exe文件 我们创建了并且要关闭？
+  //          }
+  //      }
+  //      if(bHasFileExt && 
+  //          _wcsicmp(szExt,L"EXE")==0 && 
+  //          ((ProcessInfo= (IrpContext?IrpContext->pProcessInfo:PfpGetProcessInfoForCurProc()))!= NULL) && 
+  //          ProcessInfo->bBowser && 
+  //          !ProcessInfo->bAllCreateExeFile)
+  //      {
+  //          AcsType	= PfpGetFileAttriForRequestEx(DeviceObject,FullPathName,lFullPathLenInBytes,&FilesizeForExistFile);
+  //          if(AcsType	== ACCESSING_FILE_NONEXIST )
+  //          {
+  //              Options = pstack->Parameters.Create.Options;
+  //              Options = ((Options>> 24) & 0x000000FF);
+  //              if(Options ==FILE_OPEN_IF || Options ==FILE_CREATE||FILE_OVERWRITE==Options)
+  //              {
+  //                  iostatus.Status			= STATUS_ACCESS_DENIED;
+  //                  iostatus.Information	= 0;
+		//			DbgPrint("[Wrench]394 EXIT\r\n");
+  //                  goto EXIT;
+  //              }				
+		//	}
+		//	else {
+		//		/*((PPfpFCB)(pDiskFileObject->pFCB))->bNeedEncrypt = FALSE;
+		//		((PPfpFCB)(pDiskFileObject->pFCB))->bWriteHead = FALSE;
+		//		pDiskFileObject->bFileNOTEncypted = TRUE;*/
+		//	}
+  //      }
+		//DbgPrint("[Wrench]437 EXIT\r\n");
+  //      goto PASSTHROUGH;
+  //  }
+    //if(!ProcessInfo->bBowser)//不是浏览器的情况
+    //{
+    //    bFileExtInProcessNotSelected = (bHasFileExt && PfpFileExtentionExistInProcInfoNotSelete(ProcessInfo,szExt));
+    //}else//是浏览器的情况，那么对没有后缀的或者是没有包括的文件类型的文件一律不管
+    //{
+    //    if(!bHasFileExt ||  !PfpFileExtentionExistInProcInfo(ProcessInfo,szExt))// 没有文件后缀或者没有设置过的类型的文件
+    //    {
+    //        goto PASSTHROUGH;// PASS 掉！ 不处理
+    //    }
+    //}
+    ProcessInfo = PfpGetProcessInfoForCurProc();
+if (ProcessInfo == NULL)
+{
+	DbgPrint("[Wrench]木有这个进程,PASS\r\n");
+	goto PASSTHROUGH;
+}
+
+DbgPrint("[Wrench]存在这个进程，进程名:%ws\r\n", ProcessInfo->ProcessName);
+///DbgBreakPoint();
 FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
     //下面就是处理 没有后缀的或者是要求加密的或者是 没有指定的加密类型的文件
     //这些都要求全部加密
@@ -475,6 +481,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
             {
                 iostatus.Status = STATUS_INSUFFICIENT_RESOURCES;
                 iostatus.Information = 0;
+				DbgPrint("[Wrench]创建父目录对象失败退出\r\n");
                 goto EXIT;
             }
 
@@ -500,10 +507,11 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
             {
                 iostatus.Status = STATUS_INSUFFICIENT_RESOURCES;
                 iostatus.Information = 0;
+				DbgPrint("[Wrench]创建虚拟磁盘文件对象失败退出\r\n");
                 goto EXIT;
             }
         }
-        pVirtualFileResouce		=pVirtualDiskFile->pVirtualDiskLocker;
+        pVirtualFileResouce		= pVirtualDiskFile->pVirtualDiskLocker;
         ExAcquireResourceExclusiveLite(pVirtualFileResouce,TRUE);
         //KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
 
@@ -515,30 +523,23 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
         ASSERT(pVirtualFileResouce!= NULL);
 
     }
-
-    if(bHasFileExt && exLenght== 3*sizeof(WCHAR) &&_wcsnicmp(szExt,L"DOC",3)==0)
-    {
-		//KdPrint(("文件后缀名是DOC\r\n"));
-       // iostatus.Status			= STATUS_SUCCESS;
-       // iostatus.Information	= 0;
-    }
     //////VirtualizerStart();
-    if(pDiskFileObject=PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile))
-    {
-        //ExConvertExclusiveToSharedLite(pDeviceResouce);
-    }
+    //if(pDiskFileObject=PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile))
+    //{
+    //    //ExConvertExclusiveToSharedLite(pDeviceResouce);
+    //}
     //////VirtualizerEnd();
 
-    if(IsFileTypeBelongExeType(szExt))//!!!!!这里就是为了软件先创建一个临时文件（其实是一个可执行：exe 类型的文件但是后缀不是！），然后在ReName 成要生成的文件
-    {
-        if(pDiskFileObject )
-        {		
-            PfpCloseFileHasGoThroughCleanupAndNotUsed(pDiskFileObject);
-            pDiskFileObject  = PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile);
-        }
-        if(pDiskFileObject  == NULL)
-            goto PASSTHROUGH;
-    }
+    //if(IsFileTypeBelongExeType(szExt))//!!!!!这里就是为了软件先创建一个临时文件（其实是一个可执行：exe 类型的文件但是后缀不是！），然后在ReName 成要生成的文件
+    //{
+    //    if(pDiskFileObject )
+    //    {		
+    //        PfpCloseFileHasGoThroughCleanupAndNotUsed(pDiskFileObject);
+    //        pDiskFileObject  = PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile);
+    //    }
+    //    if(pDiskFileObject  == NULL)
+    //        goto PASSTHROUGH;
+    //}
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -562,6 +563,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
         {
             iostatus.Status			= STATUS_DELETE_PENDING;
             pDiskFileObject			= NULL;
+			
             goto EXIT;	
         }
         if(PfpIsAllFileObjectThroughCleanup(pDiskFileObject))
@@ -628,9 +630,9 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
 
     if( AcsType != ACCESSING_FILE_NONEXIST )//文件存在
     {
-        if( /*!PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject) &&*/!bFolderUnderProtect )
+        if( !PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject) /*&&!bFolderUnderProtect */)
         {
-            if(FilesizeForExistFile==0 && AcsType==ACCESSING_FILE_EXIST_READONLY )
+            if(FilesizeForExistFile==0 /*&&AcsType==ACCESSING_FILE_EXIST_READONLY*/ )
                 goto PASSTHROUGH;
 
             if(!PfpIsFileEncryptedAccordtoFileSize(FilesizeForExistFile) && !bFileOurCreated)
@@ -643,7 +645,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
                 goto PASSTHROUGH;			
 
             }
-            if(/*bFirstOpen && */!PfpIsFileEncrypted(&FileFullPath,DeviceObject) && !bFileOurCreated )
+            if(bFirstOpen &&!PfpIsFileEncrypted(&FileFullPath,DeviceObject) && !bFileOurCreated )
             {		
                 goto PASSTHROUGH;
             }
@@ -670,13 +672,15 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
 
     //判断当前的应用程序创建的是不是可信的
 
-    if(!ProcessInfo  && !bFolderUnderProtect && !PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject))//当前进程不可信，但是这个文件已经正在被可信的进程编辑
+    if(!ProcessInfo/*&&!bFolderUnderProtect*/ && !PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject))//当前进程不可信，但是这个文件已经正在被可信的进程编辑
     {
         //对于 不可信的进程。
-        if(/*PfpIsRequestWriteAccess(Irp)&&*/ !bFirstOpen)//这个非可信的进程要写的权限，并且这个时候文件已经被可信的进程正在编辑？
+        if(PfpIsRequestWriteAccess(Irp)&& !bFirstOpen)//这个非可信的进程要写的权限，并且这个时候文件已经被可信的进程正在编辑？
         {
+			DbgPrint("[Wrench]不可信进程的读取\r\n");
             if(pDiskFileObject->pFCB)
             {
+				
                 if(((PPfpFCB)pDiskFileObject->pFCB)->UncleanCount ==0)
                 {
                     ExAcquireFastMutex(((PPfpFCB)pDiskFileObject->pFCB)->Other_Mutex);
@@ -686,7 +690,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
 
                 }else
                 {//说明 这个时候密文正在被编辑中，对于非可信的进程返回 拒绝访问。
-
+					DbgPrint("拒绝访问\r\n");
                     iostatus.Status			= STATUS_ACCESS_DENIED;
                     iostatus.Information	= 0;
                     goto EXIT;
@@ -700,6 +704,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////这个是记录的开头，也是重点 ，PS：mr_liu
     if(bFirstOpen)//!!!第一次打开这个文件的时候 创建一个DISKFILEOBJECT的对象
     {
+		DbgPrint("[Wrench]第一次打开文件创建文件对象\r\n");
         if( (pDiskFileObject = PfpCreateDiskFileObject(&FileFullPath,DeviceObject)) == NULL)
         {
             iostatus.Status			= STATUS_INSUFFICIENT_RESOURCES;
@@ -2668,7 +2673,7 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
         {
         case ACCESSING_FILE_EXIST:
 		{
-			DbgPrint("[Wrench]File exist!");
+			DbgPrint("[Wrench]File exist!\r\n");
 			if (!bFirstOPEN)
 			{
 				ppFcbCreated = (PPfpFCB)(*pDiskFileObject)->pFCB;
@@ -2680,7 +2685,7 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
 				{
 					((PPfpFCB)(*pDiskFileObject)->pFCB)->bNeedEncrypt = FALSE;
 				}
-				FileAttributes |= ACCESSING_FILE_EXIST_ENCRYPT;
+				//FileAttributes |= ACCESSING_FILE_EXIST_ENCRYPT;
 				ioStatus = PfpOpenExistingFcb(IrpContext,
 					FileObject,
 					&ppFcbCreated,
@@ -3145,17 +3150,17 @@ PfpGetFileAttriForRequestEx(IN PDEVICE_OBJECT pDeviceObject,
     if(bDir)
     {
         AccessType = ACCESSING_DIR_EXIST;
-    }else
-    {
-        if(AccessType ==ACCESSING_FILE_EXIST &&  FileAccessedReadonly )
-        {
-            AccessType =ACCESSING_FILE_EXIST_READONLY;
-        }
+	}/*else
+	{
+		if(AccessType ==ACCESSING_FILE_EXIST &&  FileAccessedReadonly )
+		{
+			AccessType =ACCESSING_FILE_EXIST_READONLY;
+		}
 		if (AccessType == ACCESSING_FILE_EXIST&& FileAccessedEncrypt)
 		{
 			AccessType = ACCESSING_FILE_EXIST_ENCRYPT;
 		}
-    }
+	}*/
     if(pParent != INVALID_HANDLE_VALUE )
     {
         ZwClose(pParent);
@@ -3320,18 +3325,18 @@ FILESTATE PfpGetFileAttriForRequest(PIRP pIrp, PDEVICE_OBJECT pDeviceObject,
     if(bDir)
     {
         AccessType = ACCESSING_DIR_EXIST;
-    }else
-    {
-        if(AccessType ==ACCESSING_FILE_EXIST &&  FileAccessedReadonly )
-        {
-            AccessType =ACCESSING_FILE_EXIST_READONLY;
-        }
+	}/*else
+	{
+		if(AccessType ==ACCESSING_FILE_EXIST &&  FileAccessedReadonly )
+		{
+			AccessType =ACCESSING_FILE_EXIST_READONLY;
+		}
 		if (AccessType == ACCESSING_FILE_EXIST && FileAccessedEncrypt)
 		{
 			AccessType = ACCESSING_FILE_EXIST_ENCRYPT;
 		}
 
-    }
+	}*/
     if(pParent != INVALID_HANDLE_VALUE )
     {
         ZwClose(pParent);

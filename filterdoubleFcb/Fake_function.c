@@ -144,9 +144,9 @@ NTSTATUS Fake_PfpFsdCloseFat( __in PDEVICE_OBJECT DeviceObject, __in PIRP Irp )
 NTSTATUS Fake_PfpQueryInformationFat( __in PDEVICE_OBJECT DeviceObject, __in PIRP Irp )
 {
 	PFILE_OBJECT pFileObject = IoGetCurrentIrpStackLocation(Irp)->FileObject;
-	if(pFileObject && PfpFileObjectHasOurFCB(pFileObject ))
+	if (pFileObject && PfpFileObjectHasOurFCB(pFileObject))
 	{
-		IoGetCurrentIrpStackLocation(Irp)->FileObject = ((PPfpFCB)pFileObject ->FsContext)->pDiskFileObject->pDiskFileObjectWriteThrough;		
+		IoGetCurrentIrpStackLocation(Irp)->FileObject = ((PPfpFCB)pFileObject->FsContext)->pDiskFileObject->pDiskFileObjectWriteThrough;
 	}
 	return g_Fat32Query(DeviceObject,Irp);
 }

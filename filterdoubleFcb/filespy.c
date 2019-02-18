@@ -949,7 +949,7 @@ PfpInitDriverAtStartUp( IN PDRIVER_OBJECT  DriverObject,
 	 
 
 
-	PsSetCreateProcessNotifyRoutine(pfpCreateProcessNotify,FALSE);
+	//PsSetCreateProcessNotifyRoutine(pfpCreateProcessNotify,FALSE);
 	 
 
 	//RtlInitUnicodeString(&strKeyName,L"ImagePath");
