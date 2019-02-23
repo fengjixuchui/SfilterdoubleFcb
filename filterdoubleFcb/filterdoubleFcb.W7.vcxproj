@@ -177,7 +177,7 @@
     <NMakePreprocessorDefinitions>DBG=0;WINVER=0x0601;NTDDI_VERSION=0x06010000;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(W7BASE)\inc\ddk\;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <ExecutablePath>C:\WinDDK\7600.16385.1;$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
-    <IncludePath>D:\WinDDK\7600.16385.1\inc\ddk;D:\WinDDK\7600.16385.1\inc\crt;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>C::\WinDDK\7600.16385.1\inc\ddk;C::\WinDDK\7600.16385.1\inc\crt;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='W7 checked (PREfast)|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>

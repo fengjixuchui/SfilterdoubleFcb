@@ -296,8 +296,8 @@ Return Value:
 	{
 		return STATUS_INSUFFICIENT_RESOURCES;
 	}
-	RtlZeroMemory(tmp, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR));
-	wcscpy(tmp, L"NOTEPAD.EXE");
+	RtlZeroMemory(tmp, (wcslen(L"WPSOFFICE.EXE") + 1) * sizeof(WCHAR));
+	wcscpy(tmp, L"WPS.EXE");
 	//上面有一部分废代码
 
 	//InitData(DriverObject);

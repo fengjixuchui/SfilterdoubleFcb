@@ -1525,12 +1525,12 @@ PfpNonCachedSyncIoCompleteRead(
 		 
 			if(pBuffer)
 			{	  
-				     if (PfpGetProcessInfoForCurProc())
-				    {
+				    //if (PfpGetProcessInfoForCurProc())
+				    //{
 						PfpDecryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_den_context);
 						//PfpEncryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_en_context);
 						KdPrint(("PfpNonCachedSyncIoCompleteRead--------------DecryptBuffter-------------\r\n"));
-					}
+					//}
 			}
 			if(Irp->MdlAddress!= pNtfsIoContext ->OriginatingIrp->MdlAddress )
 			{
@@ -1611,12 +1611,12 @@ PfpNonCachedAsyncIoCompleteRead(
 			{
 				//这里可以加个判断读取的进程是否解密
 				
-				if (PfpGetProcessInfoForCurProc())
-				{
+				//if (PfpGetProcessInfoForCurProc())
+				//{
 					PfpDecryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_den_context);
 					KdPrint(("PfpNonCachedAsyncIoCompleteRead--------------DecryptBuffter-------------\r\n"));
 					KdPrint(("Read File  Byte cout :%d \r\n", (ULONG)Irp->IoStatus.Information));
-				}
+				//}
 			}
 			
 			if(Irp->MdlAddress!= pOrignalIrp->MdlAddress )

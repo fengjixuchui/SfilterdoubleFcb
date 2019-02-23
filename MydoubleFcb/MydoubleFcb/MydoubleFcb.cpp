@@ -166,7 +166,7 @@ int _tmain(int argc, _TCHAR* argv[])
                        CopyMemory(FoledrInfo->szFolderPath,_T("C:\\1111"),1024);
                        FoledrInfo->FolderProtectInfo.bBackup = NULL;
                        FoledrInfo->FolderProtectInfo.bEncryptRealTime = NULL;
-                       FoledrInfo ->FolderProtectInfo.EncryptForFileTypes = 0; //0是文件夹所有加密 1是指定加密对应的文件类型 2好像都不加密
+                       FoledrInfo ->FolderProtectInfo.EncryptForFileTypes = 2; //0是文件夹所有加密 1是指定加密对应的文件类型 2好像都不加密
 					   FoledrInfo ->FolderProtectInfo.State = 1; //0是锁定文件夹禁止访问  1是解锁文件夹
 					   CopyMemory(FoledrInfo ->FolderProtectInfo.szDisplayName,"1111",50);
                        FoledrInfo ->FolderProtectInfo.Type = NOACCESS_VISABLE;

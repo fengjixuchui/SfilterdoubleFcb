@@ -2588,313 +2588,313 @@ PfpSetFileInfo (
 			break;
 		case FileLinkInformation:
 		case FileRenameInformation:
-			{
-				PPROCESSINFO	ProcessInfo			= NULL;
-				HANDLE			hProcess;
-				ULONG			FileNameLength		= 0;
-				WCHAR			*FileName			= NULL;
-				LONG			nIndex				=-1;
-				WCHAR*			pFileExt			= NULL;
-				IO_STATUS_BLOCK	iostatusread;				
-				WCHAR*			pDestFilePath		= NULL;	
-				ULONG			DestFileLenInByte   = 0; 
-				HANDLE			hFileOnDisk			= INVALID_HANDLE_VALUE;
-				WCHAR			FileszExt[50]		= {0};
-				LONG			exLenght			= 0;
-				PDEVICE_OBJECT	pDeviceForTargetFile = NULL;
-				FILE_END_OF_FILE_INFORMATION	FileSize;
-				BOOLEAN			bLastBlock				= FALSE;
-				UNICODE_STRING	DestiFilePath;
-				FILE_RENAME_INFORMATION *pRenameInfo	= NULL;
-				BOOLEAN			bTargetFileOnUsbDevice	= FALSE;
-				WCHAR			TargetdeviceDosName[3]  = {0};
-				PDEVICE_OBJECT	pOurDeviceObject		= NULL; 
-				PROTECTTYPE					ProtectTypeForFolder;
-				BOOLEAN						bEncryptForFolder			= FALSE;
-				BOOLEAN						bBackupForFolder			= FALSE;
-				BOOLEAN						bFolderUnderProtect			= FALSE;
-				BOOLEAN						bFolderLocked				= FALSE;
-				ULONG						bEncryptFileTypeForFolder	= ENCRYPT_NONE;
-				pSp->Parameters.SetFile.FileObject	 = pSpOrignal->Parameters.SetFile.FileObject;
-
-				//得到目标文件的全路径
-				//////////////////////////////////////////////////////////////////////////
-
-				pRenameInfo		= ((FILE_RENAME_INFORMATION*)IrpOrignal->AssociatedIrp.SystemBuffer);
-
-				if(pRenameInfo->FileNameLength==0)// 如果这个rename的 target的 filename 是没有无效的！那么没有必要给他解密了
-				{
-					goto PASS;
-				}
-
-
-				pDestFilePath = ExAllocatePoolWithTag(PagedPool,sizeof(WCHAR)+pRenameInfo->FileNameLength,'5007');	
-				if(pDestFilePath == NULL)
-				{
-					goto PASS;
-				}
-				DestFileLenInByte = pRenameInfo->FileNameLength;
-				RtlCopyMemory((PUCHAR)pDestFilePath,(PUCHAR)pRenameInfo->FileName,pRenameInfo->FileNameLength);
-
-				pDestFilePath[pRenameInfo->FileNameLength/sizeof(WCHAR)]=L'\0';
-				DestiFilePath.Buffer = pDestFilePath;
-				DestiFilePath.Length = (USHORT)pRenameInfo->FileNameLength;
-				DestiFilePath.MaximumLength = (USHORT)(pRenameInfo->FileNameLength+2);
-				if(!PfpGetFileExtFromFileName(&DestiFilePath,FileszExt,&exLenght))//没有找到后缀
-				{
-					goto PASS;
-				}
-				//////////////////////////////////////////////////////////////////////////
-				if(pRenameInfo->RootDirectory)
-				{
-					if(!PfpGetDeviceDosNameFromFileHandle(pRenameInfo->RootDirectory,TargetdeviceDosName))					
-					{
-						goto PASS;
-					}
-				}else
-				{
-					if(!PfpGetDosNameFromFullPath(pRenameInfo->FileName,pRenameInfo->FileNameLength,TargetdeviceDosName))
-						goto PASS;
-				}
-				
-				
-				bTargetFileOnUsbDevice = PfpIsDeviceOfUSBType((pDeviceForTargetFile=PfpGetSpyDeviceFromName(TargetdeviceDosName)));
-				if(bTargetFileOnUsbDevice && ExeHasLoggon!= 0 && IsUsbDeviceNeedEncryption(pDeviceForTargetFile) && IsFileNeedEncryptionForUsb(pDeviceForTargetFile,FileszExt))
-				{					
-					goto PASS;
-					
-				}
-
-				if(pDiskFileObject ->bProcessOpened )
-				{
-					hProcess = PsGetProcessId(IoGetCurrentProcess() );
-
-					ExAcquireResourceSharedLite(&g_ProcessInfoResource,TRUE);
-					ProcessInfo = PfpGetProcessInfoUsingProcessId(hProcess);
-					ExReleaseResourceLite(&g_ProcessInfoResource);
-
-					if(!ProcessInfo || IsListEmpty (&ProcessInfo->FileTypes))//设置了程序，但是没有设置文件类型，那么说明这个软件的所有的文件都要求是加密的。
-					{
-						goto PASS;
-					}
-
-					if(exLenght== 3*sizeof(WCHAR))//当文件后缀是3个字符的时候，进行优先的几个文件类型的判断
-					{
-						if(IsFileTypeBelongExeType(FileszExt))
-						{
-							goto DECRYPT;
-						}
-					}				
-
-					//判断访问的文件类型是不是次程序要排除的。
-					//如果是此程序明确排除的，那么 就没有任何疑问了
-					//1:只要不是明确要求解密的 那么就直接pass
-					if((ProcessInfo->bForceEncryption && PfpFileExtentionExistInProcInfoNotSelete(ProcessInfo,FileszExt) )//如果是强制加密的情况
-						|| (!ProcessInfo->bForceEncryption && !PfpFileExtentionExistInProcInfo(ProcessInfo,FileszExt)))		//解密的 不备份
-					{
-				DECRYPT:
-
-						InterlockedDecrement(&ProcessInfo->nRef);
-						ProcessInfo= NULL;	
-
-						hFileOnDisk = Fcb->pDiskFileObject->hFileWriteThrough;//PfpGetHandleFromObject(Fcb->pDiskFileObject->pDiskFileObjectWriteThrough);// Fcb->pDiskFileObject->hFileWriteThrough;
-						if(hFileOnDisk == INVALID_HANDLE_VALUE)
-						{
-							goto PASS;
-						}
-						try
-						{
-							if(CcIsFileCached(FileObject))
-							{
-								CcFlushCache( &Fcb->SegmentObject, NULL, 0, &iostatusread );		
-							}
-						}
-						except(EXCEPTION_EXECUTE_HANDLER)
-						{				
-
-						}
-						DoDecryptOnSameFile(hFileOnDisk,Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,pTargetDevice);
-
-						FileSize.EndOfFile.QuadPart = Fcb->Header.FileSize.QuadPart;
-					
-						PfpSetFileNotEncryptSize(Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,
-												FileSize.EndOfFile,
-												pTargetDevice);
-
-						Fcb->bNeedEncrypt = FALSE;					
-					}else  //做备份工作了
-					{
-						bNewFileNeedBackup = PfpIsFileTypeNeedBackup(ProcessInfo,FileszExt);
-
-					}
-				}else if(pDiskFileObject ->bUnderSecurFolder)//文件夹下面打开的文件
-				{
-					if(exLenght== 3*sizeof(WCHAR))//当文件后缀是3个字符的时候，进行优先的几个文件类型的判断
-					{
-						if(IsFileTypeBelongExeType(FileszExt))
-						{
-							goto DECRYPTForFolder;
-						}
-					}
-
-					if(pRenameInfo->RootDirectory)//有相对文件夹的时候
-					{
-						WCHAR *szFullPathofParent  = NULL;
-						LONG   lParentLen		   = 0;
-						WCHAR  szDriverLetter   [3]= {0};
-						PFILE_OBJECT			pDirFileObject = NULL;
-						NTSTATUS				ntstatus ;		
-						if(!NT_SUCCESS(ntstatus = ObReferenceObjectByHandle(pRenameInfo->RootDirectory,
-							0,
-							*IoFileObjectType,
-							KernelMode,
-							&pDirFileObject,
-							NULL)))
-						{
-							FsRtlExitFileSystem();
-							PfpCompleteRequest( NULL, &Irp, ntstatus );
-							return ntstatus;
-						}
-						ntstatus = PfpGetFullPathForFileObject(pDirFileObject,&szFullPathofParent,&lParentLen,pTargetDevice);
-						ObDereferenceObject(pDirFileObject);
-						pDirFileObject = NULL;
-						if(!NT_SUCCESS(ntstatus ))
-						{
-							goto PASS;
-						}			 
-							
-						if(!PfpGetDeviceLetter(IrpContext->RealDevice,szDriverLetter)) 
-						{
-							if(szFullPathofParent) ExFreePool(szFullPathofParent);		
-							 
-							goto PASS;
-						}
-
-						bFolderUnderProtect = GetFolderProtectProperty(szDriverLetter ,
-																		szFullPathofParent,
-																		lParentLen,
-																		&ProtectTypeForFolder,
-																		&bEncryptForFolder,
-																		&bBackupForFolder,
-																		&bFolderLocked,
-																		&bEncryptFileTypeForFolder);
-						
-						if(!bFolderUnderProtect || (bEncryptFileTypeForFolder== ENCRYPT_NONE) || ((bEncryptFileTypeForFolder==ENCRYPT_TYPES)?!IsFileTypeEncryptForFolder(szDriverLetter,szFullPathofParent,lParentLen,FileszExt):0))							
-						{				
-							if(szFullPathofParent) ExFreePool(szFullPathofParent);								
-							 
-						}else
-						{
-							bNewFileNeedBackup = IsFileNeedBackupForFolder(szDriverLetter,szFullPathofParent,lParentLen,FileszExt);
-							if(szFullPathofParent) ExFreePool(szFullPathofParent);
-							goto PASS;
-						}
-					}else //绝对路径的情况下
-					{
-						WCHAR szNameSpace[]    =L"\\??\\";
-						WCHAR szNameSpace1[]   =L"\\DosDevices\\";
-						WCHAR szDriverLetter[3]={0};
-						LONG  nIndex		   = 0;
-						ULONG  LenName		   = wcslen(szNameSpace);
-						ULONG  LenName1		   = wcslen(szNameSpace1);
-
-						if(pRenameInfo->FileNameLength>>1 <=LenName)
-						{
-							goto PASS;
-						}
-						
-						if(_wcsnicmp(pDestFilePath,szNameSpace,LenName)==0)
-						{
-							DestFileLenInByte = sizeof(WCHAR)*(pRenameInfo->FileNameLength/sizeof(WCHAR)-LenName);
-							RtlMoveMemory(pDestFilePath,&pDestFilePath[LenName],DestFileLenInByte);
-							pDestFilePath[DestFileLenInByte>>1]=L'\0'; 
-						}else
-						{
-							if(pRenameInfo->FileNameLength/sizeof(WCHAR) > LenName1 && _wcsnicmp(pDestFilePath,szNameSpace1,LenName1)==0)
-							{										 
-								DestFileLenInByte = sizeof(WCHAR)*(pRenameInfo->FileNameLength/sizeof(WCHAR)-LenName1);
-								RtlMoveMemory(pDestFilePath,&pDestFilePath[LenName1],DestFileLenInByte);
-								pDestFilePath[DestFileLenInByte>>1]=L'\0';// 这里的得到父文件夹的路径								 
-							}
-							else
-							{
-								goto PASS;
-							}
-						}
- 
-						nIndex =  (DestFileLenInByte>>1)-1;
-						while(nIndex>=0 && pDestFilePath[nIndex]!=L'\\') nIndex--;
-
-						if(nIndex<0) 
-						{
-							goto PASS;
-						}
-
-						pDestFilePath[nIndex ]=0;
-						memcpy(szDriverLetter,pDestFilePath,2*sizeof(WCHAR));
-						DestFileLenInByte = (nIndex <<1);
-					 
-						bFolderUnderProtect = GetFolderProtectProperty(szDriverLetter ,
-																		&pDestFilePath[2],
-																		(DestFileLenInByte>>1)-2,
-																		&ProtectTypeForFolder,
-																		&bEncryptForFolder,
-																		&bBackupForFolder,
-																		&bFolderLocked,
-																		&bEncryptFileTypeForFolder);
-
-						if(!bFolderUnderProtect || (bEncryptFileTypeForFolder==ENCRYPT_NONE) || ((bEncryptFileTypeForFolder==ENCRYPT_TYPES)? !IsFileTypeEncryptForFolder(szDriverLetter,&pDestFilePath[2],(DestFileLenInByte>>1)-2,FileszExt):0))							
-						{
-							goto DECRYPTForFolder;
-						}else
-						{
-							bNewFileNeedBackup = IsFileNeedBackupForFolder(szDriverLetter,&pDestFilePath[2],(DestFileLenInByte>>1)-2,FileszExt);
-						
-						}
-						goto PASS;	
-					}
-						
-					
-DECRYPTForFolder:
-						
-					hFileOnDisk = Fcb->pDiskFileObject->hFileWriteThrough;
-					if(hFileOnDisk == INVALID_HANDLE_VALUE)
-					{
-						goto PASS;
-					}
-					try
-					{
-						if(CcIsFileCached(FileObject))
-						{
-							CcFlushCache( &Fcb->SegmentObject, NULL, 0, &iostatusread );		
-						}
-					}
-					except(EXCEPTION_EXECUTE_HANDLER)
-					{				
-
-					}
-					DoDecryptOnSameFile(hFileOnDisk,Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,pTargetDevice);
-
-					FileSize.EndOfFile.QuadPart = Fcb->Header.FileSize.QuadPart;
-					
-					PfpSetFileNotEncryptSize(Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,
-											FileSize.EndOfFile,
-											pTargetDevice);
-					Fcb->bNeedEncrypt = FALSE;					
-					
-				}
-				//这里就是提前使用完毕了，所以对这个processinfo的结构的引用立即释放			
-PASS:
-				if(pDestFilePath)
-				{
-					ExFreePool(pDestFilePath);
-					pDestFilePath = NULL;
-				}				
-				if(ProcessInfo)
-				{
-					InterlockedDecrement(&ProcessInfo->nRef);
-				}				
-			}
+//			{
+//				PPROCESSINFO	ProcessInfo			= NULL;
+//				HANDLE			hProcess;
+//				ULONG			FileNameLength		= 0;
+//				WCHAR			*FileName			= NULL;
+//				LONG			nIndex				=-1;
+//				WCHAR*			pFileExt			= NULL;
+//				IO_STATUS_BLOCK	iostatusread;				
+//				WCHAR*			pDestFilePath		= NULL;	
+//				ULONG			DestFileLenInByte   = 0; 
+//				HANDLE			hFileOnDisk			= INVALID_HANDLE_VALUE;
+//				WCHAR			FileszExt[50]		= {0};
+//				LONG			exLenght			= 0;
+//				PDEVICE_OBJECT	pDeviceForTargetFile = NULL;
+//				FILE_END_OF_FILE_INFORMATION	FileSize;
+//				BOOLEAN			bLastBlock				= FALSE;
+//				UNICODE_STRING	DestiFilePath;
+//				FILE_RENAME_INFORMATION *pRenameInfo	= NULL;
+//				BOOLEAN			bTargetFileOnUsbDevice	= FALSE;
+//				WCHAR			TargetdeviceDosName[3]  = {0};
+//				PDEVICE_OBJECT	pOurDeviceObject		= NULL; 
+//				PROTECTTYPE					ProtectTypeForFolder;
+//				BOOLEAN						bEncryptForFolder			= FALSE;
+//				BOOLEAN						bBackupForFolder			= FALSE;
+//				BOOLEAN						bFolderUnderProtect			= FALSE;
+//				BOOLEAN						bFolderLocked				= FALSE;
+//				ULONG						bEncryptFileTypeForFolder	= ENCRYPT_NONE;
+//				pSp->Parameters.SetFile.FileObject	 = pSpOrignal->Parameters.SetFile.FileObject;
+//
+//				//得到目标文件的全路径
+//				//////////////////////////////////////////////////////////////////////////
+//
+//				pRenameInfo		= ((FILE_RENAME_INFORMATION*)IrpOrignal->AssociatedIrp.SystemBuffer);
+//
+//				if(pRenameInfo->FileNameLength==0)// 如果这个rename的 target的 filename 是没有无效的！那么没有必要给他解密了
+//				{
+//					goto PASS;
+//				}
+//
+//
+//				pDestFilePath = ExAllocatePoolWithTag(PagedPool,sizeof(WCHAR)+pRenameInfo->FileNameLength,'5007');	
+//				if(pDestFilePath == NULL)
+//				{
+//					goto PASS;
+//				}
+//				DestFileLenInByte = pRenameInfo->FileNameLength;
+//				RtlCopyMemory((PUCHAR)pDestFilePath,(PUCHAR)pRenameInfo->FileName,pRenameInfo->FileNameLength);
+//
+//				pDestFilePath[pRenameInfo->FileNameLength/sizeof(WCHAR)]=L'\0';
+//				DestiFilePath.Buffer = pDestFilePath;
+//				DestiFilePath.Length = (USHORT)pRenameInfo->FileNameLength;
+//				DestiFilePath.MaximumLength = (USHORT)(pRenameInfo->FileNameLength+2);
+//				if(!PfpGetFileExtFromFileName(&DestiFilePath,FileszExt,&exLenght))//没有找到后缀
+//				{
+//					goto PASS;
+//				}
+//				//////////////////////////////////////////////////////////////////////////
+//				if(pRenameInfo->RootDirectory)
+//				{
+//					if(!PfpGetDeviceDosNameFromFileHandle(pRenameInfo->RootDirectory,TargetdeviceDosName))					
+//					{
+//						goto PASS;
+//					}
+//				}else
+//				{
+//					if(!PfpGetDosNameFromFullPath(pRenameInfo->FileName,pRenameInfo->FileNameLength,TargetdeviceDosName))
+//						goto PASS;
+//				}
+//				
+//				
+//				bTargetFileOnUsbDevice = PfpIsDeviceOfUSBType((pDeviceForTargetFile=PfpGetSpyDeviceFromName(TargetdeviceDosName)));
+//				if(bTargetFileOnUsbDevice && ExeHasLoggon!= 0 && IsUsbDeviceNeedEncryption(pDeviceForTargetFile) && IsFileNeedEncryptionForUsb(pDeviceForTargetFile,FileszExt))
+//				{					
+//					goto PASS;
+//					
+//				}
+//
+//				if(pDiskFileObject ->bProcessOpened )
+//				{
+//					hProcess = PsGetProcessId(IoGetCurrentProcess() );
+//
+//					ExAcquireResourceSharedLite(&g_ProcessInfoResource,TRUE);
+//					ProcessInfo = PfpGetProcessInfoUsingProcessId(hProcess);
+//					ExReleaseResourceLite(&g_ProcessInfoResource);
+//
+//					if(!ProcessInfo || IsListEmpty (&ProcessInfo->FileTypes))//设置了程序，但是没有设置文件类型，那么说明这个软件的所有的文件都要求是加密的。
+//					{
+//						goto PASS;
+//					}
+//
+//					if(exLenght== 3*sizeof(WCHAR))//当文件后缀是3个字符的时候，进行优先的几个文件类型的判断
+//					{
+//						if(IsFileTypeBelongExeType(FileszExt))
+//						{
+//							goto DECRYPT;
+//						}
+//					}				
+//
+//					//判断访问的文件类型是不是次程序要排除的。
+//					//如果是此程序明确排除的，那么 就没有任何疑问了
+//					//1:只要不是明确要求解密的 那么就直接pass
+//					if((ProcessInfo->bForceEncryption && PfpFileExtentionExistInProcInfoNotSelete(ProcessInfo,FileszExt) )//如果是强制加密的情况
+//						|| (!ProcessInfo->bForceEncryption && !PfpFileExtentionExistInProcInfo(ProcessInfo,FileszExt)))		//解密的 不备份
+//					{
+//				DECRYPT:
+//
+//						InterlockedDecrement(&ProcessInfo->nRef);
+//						ProcessInfo= NULL;	
+//
+//						hFileOnDisk = Fcb->pDiskFileObject->hFileWriteThrough;//PfpGetHandleFromObject(Fcb->pDiskFileObject->pDiskFileObjectWriteThrough);// Fcb->pDiskFileObject->hFileWriteThrough;
+//						if(hFileOnDisk == INVALID_HANDLE_VALUE)
+//						{
+//							goto PASS;
+//						}
+//						try
+//						{
+//							if(CcIsFileCached(FileObject))
+//							{
+//								CcFlushCache( &Fcb->SegmentObject, NULL, 0, &iostatusread );		
+//							}
+//						}
+//						except(EXCEPTION_EXECUTE_HANDLER)
+//						{				
+//
+//						}
+//						DoDecryptOnSameFile(hFileOnDisk,Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,pTargetDevice);
+//
+//						FileSize.EndOfFile.QuadPart = Fcb->Header.FileSize.QuadPart;
+//					
+//						PfpSetFileNotEncryptSize(Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,
+//												FileSize.EndOfFile,
+//												pTargetDevice);
+//
+//						Fcb->bNeedEncrypt = FALSE;					
+//					}else  //做备份工作了
+//					{
+//						bNewFileNeedBackup = PfpIsFileTypeNeedBackup(ProcessInfo,FileszExt);
+//
+//					}
+//				}else if(pDiskFileObject ->bUnderSecurFolder)//文件夹下面打开的文件
+//				{
+//					if(exLenght== 3*sizeof(WCHAR))//当文件后缀是3个字符的时候，进行优先的几个文件类型的判断
+//					{
+//						if(IsFileTypeBelongExeType(FileszExt))
+//						{
+//							goto DECRYPTForFolder;
+//						}
+//					}
+//
+//					if(pRenameInfo->RootDirectory)//有相对文件夹的时候
+//					{
+//						WCHAR *szFullPathofParent  = NULL;
+//						LONG   lParentLen		   = 0;
+//						WCHAR  szDriverLetter   [3]= {0};
+//						PFILE_OBJECT			pDirFileObject = NULL;
+//						NTSTATUS				ntstatus ;		
+//						if(!NT_SUCCESS(ntstatus = ObReferenceObjectByHandle(pRenameInfo->RootDirectory,
+//							0,
+//							*IoFileObjectType,
+//							KernelMode,
+//							&pDirFileObject,
+//							NULL)))
+//						{
+//							FsRtlExitFileSystem();
+//							PfpCompleteRequest( NULL, &Irp, ntstatus );
+//							return ntstatus;
+//						}
+//						ntstatus = PfpGetFullPathForFileObject(pDirFileObject,&szFullPathofParent,&lParentLen,pTargetDevice);
+//						ObDereferenceObject(pDirFileObject);
+//						pDirFileObject = NULL;
+//						if(!NT_SUCCESS(ntstatus ))
+//						{
+//							goto PASS;
+//						}			 
+//							
+//						if(!PfpGetDeviceLetter(IrpContext->RealDevice,szDriverLetter)) 
+//						{
+//							if(szFullPathofParent) ExFreePool(szFullPathofParent);		
+//							 
+//							goto PASS;
+//						}
+//
+//						bFolderUnderProtect = GetFolderProtectProperty(szDriverLetter ,
+//																		szFullPathofParent,
+//																		lParentLen,
+//																		&ProtectTypeForFolder,
+//																		&bEncryptForFolder,
+//																		&bBackupForFolder,
+//																		&bFolderLocked,
+//																		&bEncryptFileTypeForFolder);
+//						
+//						if(!bFolderUnderProtect || (bEncryptFileTypeForFolder== ENCRYPT_NONE) || ((bEncryptFileTypeForFolder==ENCRYPT_TYPES)?!IsFileTypeEncryptForFolder(szDriverLetter,szFullPathofParent,lParentLen,FileszExt):0))							
+//						{				
+//							if(szFullPathofParent) ExFreePool(szFullPathofParent);								
+//							 
+//						}else
+//						{
+//							bNewFileNeedBackup = IsFileNeedBackupForFolder(szDriverLetter,szFullPathofParent,lParentLen,FileszExt);
+//							if(szFullPathofParent) ExFreePool(szFullPathofParent);
+//							goto PASS;
+//						}
+//					}else //绝对路径的情况下
+//					{
+//						WCHAR szNameSpace[]    =L"\\??\\";
+//						WCHAR szNameSpace1[]   =L"\\DosDevices\\";
+//						WCHAR szDriverLetter[3]={0};
+//						LONG  nIndex		   = 0;
+//						ULONG  LenName		   = wcslen(szNameSpace);
+//						ULONG  LenName1		   = wcslen(szNameSpace1);
+//
+//						if(pRenameInfo->FileNameLength>>1 <=LenName)
+//						{
+//							goto PASS;
+//						}
+//						
+//						if(_wcsnicmp(pDestFilePath,szNameSpace,LenName)==0)
+//						{
+//							DestFileLenInByte = sizeof(WCHAR)*(pRenameInfo->FileNameLength/sizeof(WCHAR)-LenName);
+//							RtlMoveMemory(pDestFilePath,&pDestFilePath[LenName],DestFileLenInByte);
+//							pDestFilePath[DestFileLenInByte>>1]=L'\0'; 
+//						}else
+//						{
+//							if(pRenameInfo->FileNameLength/sizeof(WCHAR) > LenName1 && _wcsnicmp(pDestFilePath,szNameSpace1,LenName1)==0)
+//							{										 
+//								DestFileLenInByte = sizeof(WCHAR)*(pRenameInfo->FileNameLength/sizeof(WCHAR)-LenName1);
+//								RtlMoveMemory(pDestFilePath,&pDestFilePath[LenName1],DestFileLenInByte);
+//								pDestFilePath[DestFileLenInByte>>1]=L'\0';// 这里的得到父文件夹的路径								 
+//							}
+//							else
+//							{
+//								goto PASS;
+//							}
+//						}
+// 
+//						nIndex =  (DestFileLenInByte>>1)-1;
+//						while(nIndex>=0 && pDestFilePath[nIndex]!=L'\\') nIndex--;
+//
+//						if(nIndex<0) 
+//						{
+//							goto PASS;
+//						}
+//
+//						pDestFilePath[nIndex ]=0;
+//						memcpy(szDriverLetter,pDestFilePath,2*sizeof(WCHAR));
+//						DestFileLenInByte = (nIndex <<1);
+//					 
+//						bFolderUnderProtect = GetFolderProtectProperty(szDriverLetter ,
+//																		&pDestFilePath[2],
+//																		(DestFileLenInByte>>1)-2,
+//																		&ProtectTypeForFolder,
+//																		&bEncryptForFolder,
+//																		&bBackupForFolder,
+//																		&bFolderLocked,
+//																		&bEncryptFileTypeForFolder);
+//
+//						if(!bFolderUnderProtect || (bEncryptFileTypeForFolder==ENCRYPT_NONE) || ((bEncryptFileTypeForFolder==ENCRYPT_TYPES)? !IsFileTypeEncryptForFolder(szDriverLetter,&pDestFilePath[2],(DestFileLenInByte>>1)-2,FileszExt):0))							
+//						{
+//							goto DECRYPTForFolder;
+//						}else
+//						{
+//							bNewFileNeedBackup = IsFileNeedBackupForFolder(szDriverLetter,&pDestFilePath[2],(DestFileLenInByte>>1)-2,FileszExt);
+//						
+//						}
+//						goto PASS;	
+//					}
+//						
+//					
+//DECRYPTForFolder:
+//						
+//					hFileOnDisk = Fcb->pDiskFileObject->hFileWriteThrough;
+//					if(hFileOnDisk == INVALID_HANDLE_VALUE)
+//					{
+//						goto PASS;
+//					}
+//					try
+//					{
+//						if(CcIsFileCached(FileObject))
+//						{
+//							CcFlushCache( &Fcb->SegmentObject, NULL, 0, &iostatusread );		
+//						}
+//					}
+//					except(EXCEPTION_EXECUTE_HANDLER)
+//					{				
+//
+//					}
+//					DoDecryptOnSameFile(hFileOnDisk,Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,pTargetDevice);
+//
+//					FileSize.EndOfFile.QuadPart = Fcb->Header.FileSize.QuadPart;
+//					
+//					PfpSetFileNotEncryptSize(Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,
+//											FileSize.EndOfFile,
+//											pTargetDevice);
+//					Fcb->bNeedEncrypt = FALSE;					
+//					
+//				}
+//				//这里就是提前使用完毕了，所以对这个processinfo的结构的引用立即释放			
+//PASS:
+//				if(pDestFilePath)
+//				{
+//					ExFreePool(pDestFilePath);
+//					pDestFilePath = NULL;
+//				}				
+//				if(ProcessInfo)
+//				{
+//					InterlockedDecrement(&ProcessInfo->nRef);
+//				}				
+//			}
 			break;
 		default:
 			break;
@@ -2905,271 +2905,271 @@ PASS:
 		{
 			
 		case FileRenameInformation:
-			{
-				PPROCESSINFO				ProcessInfo			= NULL;
-				HANDLE						hProcess			= INVALID_HANDLE_VALUE;
-				WCHAR*						pDestFilePath		= NULL;
-				ULONG						DestFileLenInByte   = 0; 
-				IO_STATUS_BLOCK				iostatusread;				
-
-				HANDLE						hFileOnDisk			= INVALID_HANDLE_VALUE;
-				WCHAR						FileszExt[50]		={0};
-				LONG						exLenght			=0;
-
-				FILE_END_OF_FILE_INFORMATION	FileSize;
-				BOOLEAN						bLastBlock					= FALSE;
-				UNICODE_STRING				DestiFilePath;
-				PVOID						pEncryptHead				= NULL;
-				FILE_RENAME_INFORMATION *	pRenameInfo	= NULL;
-				BOOLEAN						bTargetFileOnUsbDevice		= FALSE;
-				WCHAR						TargetdeviceDosName[3]		= {0};
-				PROTECTTYPE					ProtectTypeForFolder;
-				BOOLEAN						bEncryptForFolder			= FALSE;
-				BOOLEAN						bBackupForFolder			= FALSE;
-				BOOLEAN						bFolderUnderProtect			= FALSE;
-				BOOLEAN						bFolderLocked				= FALSE;
-				ULONG						bEncryptFileTypeForFolder	= ENCRYPT_NONE;
-				PDEVICE_OBJECT				pDeviceForTargetFile		= NULL;
-				pSp->Parameters.SetFile.FileObject		= pSpOrignal->Parameters.SetFile.FileObject;
-
-				//得到目标文件的全路径
-				//////////////////////////////////////////////////////////////////////////
-
-				pRenameInfo		= ((FILE_RENAME_INFORMATION*)IrpOrignal->AssociatedIrp.SystemBuffer);
-
-				if(pRenameInfo->FileNameLength==0)// 如果这个rename的 target的 filename 是没有无效的！那么没有必要给他解密了
-				{
-					goto BYPASS_ENCRYPT;
-				}
-
-				pDestFilePath = ExAllocatePoolWithTag(PagedPool,sizeof(WCHAR)+pRenameInfo->FileNameLength,'6007');	
-				if(pDestFilePath == NULL)
-				{
-					goto BYPASS_ENCRYPT;
-				}
-				DestFileLenInByte = pRenameInfo->FileNameLength;
-				RtlCopyMemory((PUCHAR)pDestFilePath,(PUCHAR)pRenameInfo->FileName,DestFileLenInByte);
-
-				pDestFilePath[DestFileLenInByte>>1]=L'\0';
-				DestiFilePath.Buffer = pDestFilePath;
-				DestiFilePath.Length = (USHORT)pRenameInfo->FileNameLength;
-				DestiFilePath.MaximumLength = (USHORT)(pRenameInfo->FileNameLength+2);
-				if(!PfpGetFileExtFromFileName(&DestiFilePath,FileszExt,&exLenght))//没有找到后缀
-				{
-					goto BYPASS_ENCRYPT;
-				}
-
-				if(pRenameInfo->RootDirectory)
-				{
-					if(!PfpGetDeviceDosNameFromFileHandle(pRenameInfo->RootDirectory,TargetdeviceDosName))					
-					{
-						goto BYPASS_ENCRYPT;
-					}
-				}else
-				{
-					if(!PfpGetDosNameFromFullPath(pRenameInfo->FileName,pRenameInfo->FileNameLength,TargetdeviceDosName))
-						goto BYPASS_ENCRYPT;
-				}
-
-				//对usb硬盘的rename 的操作
-				bTargetFileOnUsbDevice = PfpIsDeviceOfUSBType((pDeviceForTargetFile=PfpGetSpyDeviceFromName(TargetdeviceDosName)));
-				if(bTargetFileOnUsbDevice && ExeHasLoggon!= 0 && IsUsbDeviceNeedEncryption(pDeviceForTargetFile) && IsFileNeedEncryptionForUsb(pDeviceForTargetFile,FileszExt))
-				{					
-					goto ENCRYPT;
-
-				}	
-				if(!(pDiskFileObject ->bProcessOpened ) && !pDiskFileObject->bUnderSecurFolder)
-				{
-					goto BYPASS_ENCRYPT;
-				}
-				if(pDiskFileObject ->bProcessOpened )//进程打开的rename的操作
-				{
-					hProcess = PsGetProcessId(IoGetCurrentProcess() );
-
-					ExAcquireResourceSharedLite(&g_ProcessInfoResource,TRUE);
-					ProcessInfo = PfpGetProcessInfoUsingProcessId(hProcess);
-					ExReleaseResourceLite(&g_ProcessInfoResource);
-
-					if(!ProcessInfo || IsListEmpty (&ProcessInfo->FileTypes))//设置了程序，但是没有设置文件类型，那么说明这个软件的所有的文件都要求是加密的。
-					{
-						goto BYPASS_ENCRYPT;
-					}
-	
-					if(!PfpFileExtentionExistInProcInfo(ProcessInfo,FileszExt))
-					{
-						goto BYPASS_ENCRYPT;
-					}
-					bNewFileNeedBackup = PfpIsFileTypeNeedBackup(ProcessInfo,FileszExt);
-				}else  //在文件保险箱里面
-				{
-					if(pRenameInfo->RootDirectory)//有相对文件夹的时候
-					{
-						WCHAR *szFullPathofParent  = NULL;
-						LONG   lParentLen		   = 0;
-						WCHAR  szDriverLetter   [3]= {0};
-						PFILE_OBJECT			pDirFileObject = NULL;
-						NTSTATUS				ntstatus ;	
-						BOOLEAN					bNeedEncrypt = FALSE;
-						if(!NT_SUCCESS(ntstatus = ObReferenceObjectByHandle(pRenameInfo->RootDirectory,0,*IoFileObjectType,KernelMode,&pDirFileObject,NULL))
-							)
-						{
-							FsRtlExitFileSystem();
-							PfpCompleteRequest( NULL, &Irp, ntstatus );
-							return ntstatus;
-						}
-				
-						ntstatus = PfpGetFullPathForFileObject(pDirFileObject,&szFullPathofParent,&lParentLen,pTargetDevice);
-						ObDereferenceObject(pDirFileObject);
-						pDirFileObject = NULL;
-
-						if(!NT_SUCCESS(ntstatus ))
-						{
-							goto BYPASS_ENCRYPT;
-						}
-
-						if(!PfpGetDeviceLetter(IrpContext->RealDevice,szDriverLetter))
-						{
-							if(szFullPathofParent) 
-							{
-								ExFreePool(szFullPathofParent);
-							}
-							goto BYPASS_ENCRYPT;
-						}
-
-						bFolderUnderProtect = GetFolderProtectProperty(szDriverLetter ,
-																		szFullPathofParent,
-																		lParentLen,
-																		&ProtectTypeForFolder,
-																		&bEncryptForFolder,
-																		&bBackupForFolder,
-																		&bFolderLocked,
-																		&bEncryptFileTypeForFolder);
-						
-						if(bFolderUnderProtect && (bEncryptFileTypeForFolder!= ENCRYPT_NONE)&& ((bEncryptFileTypeForFolder==ENCRYPT_TYPES)?IsFileTypeEncryptForFolder(szDriverLetter,szFullPathofParent,lParentLen,FileszExt):1))
-						{
-							bNewFileNeedBackup = IsFileNeedBackupForFolder(szDriverLetter,szFullPathofParent,lParentLen,FileszExt);
-							
-							bNeedEncrypt = TRUE;
-						}
-						if(szFullPathofParent) 
-						{
-							ExFreePool(szFullPathofParent);
-						}
-						 if(!bNeedEncrypt )
-						 {
-							 goto BYPASS_ENCRYPT;
-						 }						
-						 
-					}else //绝对路径的情况下
-					{
-						WCHAR szNameSpace[]    =L"\\??\\";
-						WCHAR szNameSpace1[]   =L"\\DosDevices\\";
-						WCHAR szDriverLetter[3]={0};
-						LONG  nIndex		   = 0;
-						ULONG  LenName		   = wcslen(szNameSpace);
-						ULONG  LenName1		   = wcslen(szNameSpace1);
-						if(pRenameInfo->FileNameLength<=LenName)
-						{
-							goto BYPASS_ENCRYPT;
-						}
-						 
-							 
-						if(_wcsnicmp(pDestFilePath,szNameSpace,LenName)==0)
-						{
-							DestFileLenInByte = pRenameInfo->FileNameLength-(LenName<<1);
-							RtlMoveMemory(pDestFilePath,&pDestFilePath[LenName],DestFileLenInByte);
-							pDestFilePath[DestFileLenInByte>>1]=L'\0';									
-							 
-						}else
-						if((pRenameInfo->FileNameLength>>1) >LenName1  && _wcsnicmp(pDestFilePath,szNameSpace1,LenName1)==0)
-						{
-							DestFileLenInByte = pRenameInfo->FileNameLength-(LenName1<<1);
-							RtlMoveMemory(pDestFilePath,&pDestFilePath[LenName1],DestFileLenInByte);
-							pDestFilePath[DestFileLenInByte>>1]=L'\0';	
-						}
-						else
-						{
-							goto BYPASS_ENCRYPT;
-						}
- 
-						nIndex =  ((DestFileLenInByte>>1)-1);
-						while(nIndex>=0 && pDestFilePath[nIndex]!=L'\\') nIndex--;
-
-						if(nIndex<0) goto BYPASS_ENCRYPT;
-
-						pDestFilePath[nIndex ]=0;
-						 
-						memcpy(szDriverLetter,pDestFilePath,2*sizeof(WCHAR));
-						 
-
-						bFolderUnderProtect = GetFolderProtectProperty(szDriverLetter ,&pDestFilePath[2],nIndex-2,&ProtectTypeForFolder,
-							&bEncryptForFolder,&bBackupForFolder,&bFolderLocked,&bEncryptFileTypeForFolder);
-
-						if(bFolderUnderProtect && (bEncryptFileTypeForFolder!= ENCRYPT_NONE)&& 
-							((bEncryptFileTypeForFolder==ENCRYPT_TYPES)?IsFileTypeEncryptForFolder(szDriverLetter,&pDestFilePath[2],nIndex-2,FileszExt):1))
-						{
-							bNewFileNeedBackup = IsFileNeedBackupForFolder(szDriverLetter,&pDestFilePath[2],nIndex-2,FileszExt);							
-						}else
-						{
-							goto BYPASS_ENCRYPT;
-						}
-					}
-				} 
-ENCRYPT:
-				if(ProcessInfo)
-				{
-					InterlockedDecrement(&ProcessInfo->nRef);
-					ProcessInfo= NULL;	
-				}
-
-				hFileOnDisk = Fcb->pDiskFileObject->hFileWriteThrough;//PfpGetHandleFromObject(Fcb->pDiskFileObject->pDiskFileObjectWriteThrough);// Fcb->pDiskFileObject->hFileWriteThrough;
-				if(hFileOnDisk == INVALID_HANDLE_VALUE)
-				{
-					goto PASS;
-				}
-				try
-				{
-					if(CcIsFileCached(FileObject))
-					{
-						CcFlushCache( &Fcb->SegmentObject, NULL, 0, &iostatusread );		
-					}
-				}
-				except(EXCEPTION_EXECUTE_HANDLER)
-				{				
-
-				}
-				DoEncryptOnSameFile(hFileOnDisk,Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,pTargetDevice);
-				pEncryptHead = PfpCreateEncryptHead(Fcb);
-				if(pEncryptHead )
-				{
-					LARGE_INTEGER offset= {0};
-					PfpWriteFileByAllocatedIrp(pEncryptHead,ENCRYPTIONHEADLENGTH,offset,Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,pTargetDevice,&iostatusread);
-					
-				}
-				
-				FileSize.EndOfFile.QuadPart = (Fcb->Header.FileSize.QuadPart+ENCRYPTIONHEADLENGTH+g_SectorSize-1)&~((LONGLONG)g_SectorSize-1);
-				PfpSetFileNotEncryptSize(Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,
-										FileSize.EndOfFile,
-										pTargetDevice);
-
-				Fcb->bNeedEncrypt = TRUE;	
-BYPASS_ENCRYPT:
-				if(pEncryptHead)
-				{
-					ExFreePool(pEncryptHead);
-					pEncryptHead = NULL;
-				}
-				if(pDestFilePath)
-				{
-					ExFreePool(pDestFilePath);
-					pDestFilePath = NULL;
-				}				
-				if(ProcessInfo)
-				{
-					InterlockedDecrement(&ProcessInfo->nRef);
-				}	
-			}
-
+//			{
+//				PPROCESSINFO				ProcessInfo			= NULL;
+//				HANDLE						hProcess			= INVALID_HANDLE_VALUE;
+//				WCHAR*						pDestFilePath		= NULL;
+//				ULONG						DestFileLenInByte   = 0; 
+//				IO_STATUS_BLOCK				iostatusread;				
+//
+//				HANDLE						hFileOnDisk			= INVALID_HANDLE_VALUE;
+//				WCHAR						FileszExt[50]		={0};
+//				LONG						exLenght			=0;
+//
+//				FILE_END_OF_FILE_INFORMATION	FileSize;
+//				BOOLEAN						bLastBlock					= FALSE;
+//				UNICODE_STRING				DestiFilePath;
+//				PVOID						pEncryptHead				= NULL;
+//				FILE_RENAME_INFORMATION *	pRenameInfo	= NULL;
+//				BOOLEAN						bTargetFileOnUsbDevice		= FALSE;
+//				WCHAR						TargetdeviceDosName[3]		= {0};
+//				PROTECTTYPE					ProtectTypeForFolder;
+//				BOOLEAN						bEncryptForFolder			= FALSE;
+//				BOOLEAN						bBackupForFolder			= FALSE;
+//				BOOLEAN						bFolderUnderProtect			= FALSE;
+//				BOOLEAN						bFolderLocked				= FALSE;
+//				ULONG						bEncryptFileTypeForFolder	= ENCRYPT_NONE;
+//				PDEVICE_OBJECT				pDeviceForTargetFile		= NULL;
+//				pSp->Parameters.SetFile.FileObject		= pSpOrignal->Parameters.SetFile.FileObject;
+//
+//				//得到目标文件的全路径
+//				//////////////////////////////////////////////////////////////////////////
+//
+//				pRenameInfo		= ((FILE_RENAME_INFORMATION*)IrpOrignal->AssociatedIrp.SystemBuffer);
+//
+//				if(pRenameInfo->FileNameLength==0)// 如果这个rename的 target的 filename 是没有无效的！那么没有必要给他解密了
+//				{
+//					goto BYPASS_ENCRYPT;
+//				}
+//
+//				pDestFilePath = ExAllocatePoolWithTag(PagedPool,sizeof(WCHAR)+pRenameInfo->FileNameLength,'6007');	
+//				if(pDestFilePath == NULL)
+//				{
+//					goto BYPASS_ENCRYPT;
+//				}
+//				DestFileLenInByte = pRenameInfo->FileNameLength;
+//				RtlCopyMemory((PUCHAR)pDestFilePath,(PUCHAR)pRenameInfo->FileName,DestFileLenInByte);
+//
+//				pDestFilePath[DestFileLenInByte>>1]=L'\0';
+//				DestiFilePath.Buffer = pDestFilePath;
+//				DestiFilePath.Length = (USHORT)pRenameInfo->FileNameLength;
+//				DestiFilePath.MaximumLength = (USHORT)(pRenameInfo->FileNameLength+2);
+//				if(!PfpGetFileExtFromFileName(&DestiFilePath,FileszExt,&exLenght))//没有找到后缀
+//				{
+//					goto BYPASS_ENCRYPT;
+//				}
+//
+//				if(pRenameInfo->RootDirectory)
+//				{
+//					if(!PfpGetDeviceDosNameFromFileHandle(pRenameInfo->RootDirectory,TargetdeviceDosName))					
+//					{
+//						goto BYPASS_ENCRYPT;
+//					}
+//				}else
+//				{
+//					if(!PfpGetDosNameFromFullPath(pRenameInfo->FileName,pRenameInfo->FileNameLength,TargetdeviceDosName))
+//						goto BYPASS_ENCRYPT;
+//				}
+//
+//				//对usb硬盘的rename 的操作
+//				bTargetFileOnUsbDevice = PfpIsDeviceOfUSBType((pDeviceForTargetFile=PfpGetSpyDeviceFromName(TargetdeviceDosName)));
+//				if(bTargetFileOnUsbDevice && ExeHasLoggon!= 0 && IsUsbDeviceNeedEncryption(pDeviceForTargetFile) && IsFileNeedEncryptionForUsb(pDeviceForTargetFile,FileszExt))
+//				{					
+//					goto ENCRYPT;
+//
+//				}	
+//				if(!(pDiskFileObject ->bProcessOpened ) && !pDiskFileObject->bUnderSecurFolder)
+//				{
+//					goto BYPASS_ENCRYPT;
+//				}
+//				if(pDiskFileObject ->bProcessOpened )//进程打开的rename的操作
+//				{
+//					hProcess = PsGetProcessId(IoGetCurrentProcess() );
+//
+//					ExAcquireResourceSharedLite(&g_ProcessInfoResource,TRUE);
+//					ProcessInfo = PfpGetProcessInfoUsingProcessId(hProcess);
+//					ExReleaseResourceLite(&g_ProcessInfoResource);
+//
+//					if(!ProcessInfo || IsListEmpty (&ProcessInfo->FileTypes))//设置了程序，但是没有设置文件类型，那么说明这个软件的所有的文件都要求是加密的。
+//					{
+//						goto BYPASS_ENCRYPT;
+//					}
+//	
+//					if(!PfpFileExtentionExistInProcInfo(ProcessInfo,FileszExt))
+//					{
+//						goto BYPASS_ENCRYPT;
+//					}
+//					bNewFileNeedBackup = PfpIsFileTypeNeedBackup(ProcessInfo,FileszExt);
+//				}else  //在文件保险箱里面
+//				{
+//					if(pRenameInfo->RootDirectory)//有相对文件夹的时候
+//					{
+//						WCHAR *szFullPathofParent  = NULL;
+//						LONG   lParentLen		   = 0;
+//						WCHAR  szDriverLetter   [3]= {0};
+//						PFILE_OBJECT			pDirFileObject = NULL;
+//						NTSTATUS				ntstatus ;	
+//						BOOLEAN					bNeedEncrypt = FALSE;
+//						if(!NT_SUCCESS(ntstatus = ObReferenceObjectByHandle(pRenameInfo->RootDirectory,0,*IoFileObjectType,KernelMode,&pDirFileObject,NULL))
+//							)
+//						{
+//							FsRtlExitFileSystem();
+//							PfpCompleteRequest( NULL, &Irp, ntstatus );
+//							return ntstatus;
+//						}
+//				
+//						ntstatus = PfpGetFullPathForFileObject(pDirFileObject,&szFullPathofParent,&lParentLen,pTargetDevice);
+//						ObDereferenceObject(pDirFileObject);
+//						pDirFileObject = NULL;
+//
+//						if(!NT_SUCCESS(ntstatus ))
+//						{
+//							goto BYPASS_ENCRYPT;
+//						}
+//
+//						if(!PfpGetDeviceLetter(IrpContext->RealDevice,szDriverLetter))
+//						{
+//							if(szFullPathofParent) 
+//							{
+//								ExFreePool(szFullPathofParent);
+//							}
+//							goto BYPASS_ENCRYPT;
+//						}
+//
+//						bFolderUnderProtect = GetFolderProtectProperty(szDriverLetter ,
+//																		szFullPathofParent,
+//																		lParentLen,
+//																		&ProtectTypeForFolder,
+//																		&bEncryptForFolder,
+//																		&bBackupForFolder,
+//																		&bFolderLocked,
+//																		&bEncryptFileTypeForFolder);
+//						
+//						if(bFolderUnderProtect && (bEncryptFileTypeForFolder!= ENCRYPT_NONE)&& ((bEncryptFileTypeForFolder==ENCRYPT_TYPES)?IsFileTypeEncryptForFolder(szDriverLetter,szFullPathofParent,lParentLen,FileszExt):1))
+//						{
+//							bNewFileNeedBackup = IsFileNeedBackupForFolder(szDriverLetter,szFullPathofParent,lParentLen,FileszExt);
+//							
+//							bNeedEncrypt = TRUE;
+//						}
+//						if(szFullPathofParent) 
+//						{
+//							ExFreePool(szFullPathofParent);
+//						}
+//						 if(!bNeedEncrypt )
+//						 {
+//							 goto BYPASS_ENCRYPT;
+//						 }						
+//						 
+//					}else //绝对路径的情况下
+//					{
+//						WCHAR szNameSpace[]    =L"\\??\\";
+//						WCHAR szNameSpace1[]   =L"\\DosDevices\\";
+//						WCHAR szDriverLetter[3]={0};
+//						LONG  nIndex		   = 0;
+//						ULONG  LenName		   = wcslen(szNameSpace);
+//						ULONG  LenName1		   = wcslen(szNameSpace1);
+//						if(pRenameInfo->FileNameLength<=LenName)
+//						{
+//							goto BYPASS_ENCRYPT;
+//						}
+//						 
+//							 
+//						if(_wcsnicmp(pDestFilePath,szNameSpace,LenName)==0)
+//						{
+//							DestFileLenInByte = pRenameInfo->FileNameLength-(LenName<<1);
+//							RtlMoveMemory(pDestFilePath,&pDestFilePath[LenName],DestFileLenInByte);
+//							pDestFilePath[DestFileLenInByte>>1]=L'\0';									
+//							 
+//						}else
+//						if((pRenameInfo->FileNameLength>>1) >LenName1  && _wcsnicmp(pDestFilePath,szNameSpace1,LenName1)==0)
+//						{
+//							DestFileLenInByte = pRenameInfo->FileNameLength-(LenName1<<1);
+//							RtlMoveMemory(pDestFilePath,&pDestFilePath[LenName1],DestFileLenInByte);
+//							pDestFilePath[DestFileLenInByte>>1]=L'\0';	
+//						}
+//						else
+//						{
+//							goto BYPASS_ENCRYPT;
+//						}
+// 
+//						nIndex =  ((DestFileLenInByte>>1)-1);
+//						while(nIndex>=0 && pDestFilePath[nIndex]!=L'\\') nIndex--;
+//
+//						if(nIndex<0) goto BYPASS_ENCRYPT;
+//
+//						pDestFilePath[nIndex ]=0;
+//						 
+//						memcpy(szDriverLetter,pDestFilePath,2*sizeof(WCHAR));
+//						 
+//
+//						bFolderUnderProtect = GetFolderProtectProperty(szDriverLetter ,&pDestFilePath[2],nIndex-2,&ProtectTypeForFolder,
+//							&bEncryptForFolder,&bBackupForFolder,&bFolderLocked,&bEncryptFileTypeForFolder);
+//
+//						if(bFolderUnderProtect && (bEncryptFileTypeForFolder!= ENCRYPT_NONE)&& 
+//							((bEncryptFileTypeForFolder==ENCRYPT_TYPES)?IsFileTypeEncryptForFolder(szDriverLetter,&pDestFilePath[2],nIndex-2,FileszExt):1))
+//						{
+//							bNewFileNeedBackup = IsFileNeedBackupForFolder(szDriverLetter,&pDestFilePath[2],nIndex-2,FileszExt);							
+//						}else
+//						{
+//							goto BYPASS_ENCRYPT;
+//						}
+//					}
+//				} 
+//ENCRYPT:
+//				if(ProcessInfo)
+//				{
+//					InterlockedDecrement(&ProcessInfo->nRef);
+//					ProcessInfo= NULL;	
+//				}
+//
+//				hFileOnDisk = Fcb->pDiskFileObject->hFileWriteThrough;//PfpGetHandleFromObject(Fcb->pDiskFileObject->pDiskFileObjectWriteThrough);// Fcb->pDiskFileObject->hFileWriteThrough;
+//				if(hFileOnDisk == INVALID_HANDLE_VALUE)
+//				{
+//					goto PASS;
+//				}
+//				try
+//				{
+//					if(CcIsFileCached(FileObject))
+//					{
+//						CcFlushCache( &Fcb->SegmentObject, NULL, 0, &iostatusread );		
+//					}
+//				}
+//				except(EXCEPTION_EXECUTE_HANDLER)
+//				{				
+//
+//				}
+//				DoEncryptOnSameFile(hFileOnDisk,Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,pTargetDevice);
+//				pEncryptHead = PfpCreateEncryptHead(Fcb);
+//				if(pEncryptHead )
+//				{
+//					LARGE_INTEGER offset= {0};
+//					PfpWriteFileByAllocatedIrp(pEncryptHead,ENCRYPTIONHEADLENGTH,offset,Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,pTargetDevice,&iostatusread);
+//					
+//				}
+//				
+//				FileSize.EndOfFile.QuadPart = (Fcb->Header.FileSize.QuadPart+ENCRYPTIONHEADLENGTH+g_SectorSize-1)&~((LONGLONG)g_SectorSize-1);
+//				PfpSetFileNotEncryptSize(Fcb->pDiskFileObject->pDiskFileObjectWriteThrough,
+//										FileSize.EndOfFile,
+//										pTargetDevice);
+//
+//				Fcb->bNeedEncrypt = TRUE;	
+//BYPASS_ENCRYPT:
+//				if(pEncryptHead)
+//				{
+//					ExFreePool(pEncryptHead);
+//					pEncryptHead = NULL;
+//				}
+//				if(pDestFilePath)
+//				{
+//					ExFreePool(pDestFilePath);
+//					pDestFilePath = NULL;
+//				}				
+//				if(ProcessInfo)
+//				{
+//					InterlockedDecrement(&ProcessInfo->nRef);
+//				}	
+//			}
+//
 			break;
 		default:
 			break;
@@ -3229,104 +3229,104 @@ BYPASS_ENCRYPT:
 	//重命名后，ntfs就会把命名后的文件路径和名字改写到fileobject的name里面去
 	//所以，这里我们要做补救工作。但是这个fileobject->context->fcb->diskfileobject->fullpath 还是以前的打开的文件路径
 
-	if(NT_SUCCESS(status) && InformationClass== FileRenameInformation)		
-	{
-		PERESOURCE pSourceFileParentResource = Fcb->pDiskFileObject->pParentDirResource;
-		//ExAcquireResourceExclusiveLite( pSourceFileParentResource,TRUE );
-		if(NT_SUCCESS(PfpReBuildFullPathForDiskFileObjectAfterRename(FileObject,(PFILE_RENAME_INFORMATION)IrpOrignal->AssociatedIrp.SystemBuffer,pSpOrignal,Fcb,IrpContext)))
-		{
-			PWCHAR pszRemainer = NULL;
-			BOOLEAN bComplete = FALSE;
-			PDISKDIROBEJECT		pTargetParentDir = NULL; 
-			PDISKDIROBEJECT		pTempParentDir = NULL;
-			PDISKDIROBEJECT		pRootDir = PfpGetVirtualRootDirFromSpyDevice(IrpContext->RealDevice);
-			PDISKFILEOBJECT		pTempDisk = NULL;
-			PVIRTUALDISKFILE	pVirtualDiskFile = NULL;
-			PERESOURCE			pTempResource = NULL;
-			
-			//ExAcquireResourceExclusiveLite( pRootDir->AccssLocker,TRUE );
-			pTargetParentDir   = PfpPareseToDirObject(pRootDir ,Fcb->pDiskFileObject->FullFilePath.Buffer,&pszRemainer,&bComplete );
-			if(pTargetParentDir  !=((PVIRTUALDISKFILE)Fcb->pDiskFileObject->pVirtualDiskFile)->pParentDir)
-			{
-			
-				if(!bComplete)
-				{				
-					pTempParentDir =PfpMakeVirtualChildDirForFile(pTargetParentDir ,&pszRemainer);
-				} 
-				else
-				{
-					pTempParentDir =pTargetParentDir  ;
-				}
+	//if(NT_SUCCESS(status) && InformationClass== FileRenameInformation)		
+	//{
+	//	PERESOURCE pSourceFileParentResource = Fcb->pDiskFileObject->pParentDirResource;
+	//	//ExAcquireResourceExclusiveLite( pSourceFileParentResource,TRUE );
+	//	if(NT_SUCCESS(PfpReBuildFullPathForDiskFileObjectAfterRename(FileObject,(PFILE_RENAME_INFORMATION)IrpOrignal->AssociatedIrp.SystemBuffer,pSpOrignal,Fcb,IrpContext)))
+	//	{
+	//		PWCHAR pszRemainer = NULL;
+	//		BOOLEAN bComplete = FALSE;
+	//		PDISKDIROBEJECT		pTargetParentDir = NULL; 
+	//		PDISKDIROBEJECT		pTempParentDir = NULL;
+	//		PDISKDIROBEJECT		pRootDir = PfpGetVirtualRootDirFromSpyDevice(IrpContext->RealDevice);
+	//		PDISKFILEOBJECT		pTempDisk = NULL;
+	//		PVIRTUALDISKFILE	pVirtualDiskFile = NULL;
+	//		PERESOURCE			pTempResource = NULL;
+	//		
+	//		//ExAcquireResourceExclusiveLite( pRootDir->AccssLocker,TRUE );
+	//		pTargetParentDir   = PfpPareseToDirObject(pRootDir ,Fcb->pDiskFileObject->FullFilePath.Buffer,&pszRemainer,&bComplete );
+	//		if(pTargetParentDir  !=((PVIRTUALDISKFILE)Fcb->pDiskFileObject->pVirtualDiskFile)->pParentDir)
+	//		{
+	//		
+	//			if(!bComplete)
+	//			{				
+	//				pTempParentDir =PfpMakeVirtualChildDirForFile(pTargetParentDir ,&pszRemainer);
+	//			} 
+	//			else
+	//			{
+	//				pTempParentDir =pTargetParentDir  ;
+	//			}
 
-				if(bComplete)
-				{
-					UNICODE_STRING TempString;
-					TempString.Buffer = pszRemainer;
-					TempString.Length = (Fcb->pDiskFileObject->FullFilePath.Length-(USHORT)((PUCHAR)pszRemainer-(PUCHAR)Fcb->pDiskFileObject->FullFilePath.Buffer));
-					TempString.MaximumLength  = 2+TempString.Length ;
-					pVirtualDiskFile = PfpFindVirtualDiskFileObjectInParent(pTempParentDir,&TempString);
-				 	ASSERT(NULL==PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile));
-				}
-				if(pVirtualDiskFile== NULL)
-				{
-					pVirtualDiskFile = CreateVirDiskFileAndInsertIntoParentVirtual(pTempParentDir,pszRemainer);
-				}
-				ASSERT(pVirtualDiskFile!= NULL);
+	//			if(bComplete)
+	//			{
+	//				UNICODE_STRING TempString;
+	//				TempString.Buffer = pszRemainer;
+	//				TempString.Length = (Fcb->pDiskFileObject->FullFilePath.Length-(USHORT)((PUCHAR)pszRemainer-(PUCHAR)Fcb->pDiskFileObject->FullFilePath.Buffer));
+	//				TempString.MaximumLength  = 2+TempString.Length ;
+	//				pVirtualDiskFile = PfpFindVirtualDiskFileObjectInParent(pTempParentDir,&TempString);
+	//			 	ASSERT(NULL==PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile));
+	//			}
+	//			if(pVirtualDiskFile== NULL)
+	//			{
+	//				pVirtualDiskFile = CreateVirDiskFileAndInsertIntoParentVirtual(pTempParentDir,pszRemainer);
+	//			}
+	//			ASSERT(pVirtualDiskFile!= NULL);
 
-				//从原来的目录下面 断下来，并且把原有的 virtualdiskfile 删除掉
-				pTempResource = ((PVIRTUALDISKFILE)(Fcb->pDiskFileObject->pVirtualDiskFile))->pVirtualDiskLocker;
-				KdPrint(("setinfomation function accquire file resource %Xh",pTempResource));
-				ExAcquireResourceExclusiveLite(pTempResource ,TRUE);
-				
-				PfpRemoveDiskFileObjectFromListEntry(Fcb->pDiskFileObject);					
-				PfpAddDiskFileObjectIntoItsVirtualDiskFile(pVirtualDiskFile,Fcb->pDiskFileObject);
-				
-				ExReleaseResourceLite(pTempResource);
-				KdPrint(("setinfomation function release file resource %Xh",pTempResource));
-				PfpDeleteVirtualDiskFile((PVIRTUALDISKFILE)(Fcb->pDiskFileObject->pVirtualDiskFile),NULL);
-				
-				
-				 
-				//ExReleaseResourceLite( pTempParentDir ->AccssLocker);
-				 
-			} else
-			{
-				UNICODE_STRING TempString;
-				PVIRTUALDISKFILE pVirtualTargetDiskFile =  NULL;
+	//			//从原来的目录下面 断下来，并且把原有的 virtualdiskfile 删除掉
+	//			pTempResource = ((PVIRTUALDISKFILE)(Fcb->pDiskFileObject->pVirtualDiskFile))->pVirtualDiskLocker;
+	//			KdPrint(("setinfomation function accquire file resource %Xh",pTempResource));
+	//			ExAcquireResourceExclusiveLite(pTempResource ,TRUE);
+	//			
+	//			PfpRemoveDiskFileObjectFromListEntry(Fcb->pDiskFileObject);					
+	//			PfpAddDiskFileObjectIntoItsVirtualDiskFile(pVirtualDiskFile,Fcb->pDiskFileObject);
+	//			
+	//			ExReleaseResourceLite(pTempResource);
+	//			KdPrint(("setinfomation function release file resource %Xh",pTempResource));
+	//			PfpDeleteVirtualDiskFile((PVIRTUALDISKFILE)(Fcb->pDiskFileObject->pVirtualDiskFile),NULL);
+	//			
+	//			
+	//			 
+	//			//ExReleaseResourceLite( pTempParentDir ->AccssLocker);
+	//			 
+	//		} else
+	//		{
+	//			UNICODE_STRING TempString;
+	//			PVIRTUALDISKFILE pVirtualTargetDiskFile =  NULL;
 
-				TempString.Buffer = pszRemainer;
-				TempString.Length = (Fcb->pDiskFileObject->FullFilePath.Length-(USHORT)((PUCHAR)pszRemainer-(PUCHAR)Fcb->pDiskFileObject->FullFilePath.Buffer));
-				TempString.MaximumLength  = 2+TempString.Length ;
-				pVirtualTargetDiskFile= PfpFindVirtualDiskFileObjectInParent(pTargetParentDir,&TempString);		
-				if(pVirtualTargetDiskFile)
-				{
-					ASSERT(NULL==PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile));					
-					//RemoveEntryList(&pVirtualTargetDiskFile->list);
-					PfpDeleteVirtualDiskFile(pVirtualTargetDiskFile,NULL);
-				}
-				pVirtualDiskFile = (PVIRTUALDISKFILE)Fcb->pDiskFileObject->pVirtualDiskFile;
-				 
-				if(Fcb->pDiskFileObject->FileNameOnDisk.Buffer)
-				{
-					if(pVirtualDiskFile->FileName.Buffer)
-					{
-						ExFreePool_A(pVirtualDiskFile->FileName.Buffer);
-					}
-					pVirtualDiskFile->FileName.Length = Fcb->pDiskFileObject->FileNameOnDisk.Length;
-					pVirtualDiskFile->FileName.Buffer = ExAllocatePoolWithTag(PagedPool,pVirtualDiskFile->FileName.Length+2,'7007');
-					if(pVirtualDiskFile->FileName.Buffer)
-					{
-						memcpy(pVirtualDiskFile->FileName.Buffer,Fcb->pDiskFileObject->FileNameOnDisk.Buffer,pVirtualDiskFile->FileName.Length);
-						pVirtualDiskFile->FileName.Buffer[pVirtualDiskFile->FileName.Length>>1]=L'\0';
-					}
+	//			TempString.Buffer = pszRemainer;
+	//			TempString.Length = (Fcb->pDiskFileObject->FullFilePath.Length-(USHORT)((PUCHAR)pszRemainer-(PUCHAR)Fcb->pDiskFileObject->FullFilePath.Buffer));
+	//			TempString.MaximumLength  = 2+TempString.Length ;
+	//			pVirtualTargetDiskFile= PfpFindVirtualDiskFileObjectInParent(pTargetParentDir,&TempString);		
+	//			if(pVirtualTargetDiskFile)
+	//			{
+	//				ASSERT(NULL==PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile));					
+	//				//RemoveEntryList(&pVirtualTargetDiskFile->list);
+	//				PfpDeleteVirtualDiskFile(pVirtualTargetDiskFile,NULL);
+	//			}
+	//			pVirtualDiskFile = (PVIRTUALDISKFILE)Fcb->pDiskFileObject->pVirtualDiskFile;
+	//			 
+	//			if(Fcb->pDiskFileObject->FileNameOnDisk.Buffer)
+	//			{
+	//				if(pVirtualDiskFile->FileName.Buffer)
+	//				{
+	//					ExFreePool_A(pVirtualDiskFile->FileName.Buffer);
+	//				}
+	//				pVirtualDiskFile->FileName.Length = Fcb->pDiskFileObject->FileNameOnDisk.Length;
+	//				pVirtualDiskFile->FileName.Buffer = ExAllocatePoolWithTag(PagedPool,pVirtualDiskFile->FileName.Length+2,'7007');
+	//				if(pVirtualDiskFile->FileName.Buffer)
+	//				{
+	//					memcpy(pVirtualDiskFile->FileName.Buffer,Fcb->pDiskFileObject->FileNameOnDisk.Buffer,pVirtualDiskFile->FileName.Length);
+	//					pVirtualDiskFile->FileName.Buffer[pVirtualDiskFile->FileName.Length>>1]=L'\0';
+	//				}
 
-					pVirtualDiskFile->FileName.MaximumLength = pVirtualDiskFile->FileName.Length+2;
-				}
-				//ExReleaseResourceLite(  pTargetParentDir->AccssLocker);
-			}
-			//ExReleaseResourceLite(pSourceFileParentResource);
-		}
-	}
+	//				pVirtualDiskFile->FileName.MaximumLength = pVirtualDiskFile->FileName.Length+2;
+	//			}
+	//			//ExReleaseResourceLite(  pTargetParentDir->AccssLocker);
+	//		}
+	//		//ExReleaseResourceLite(pSourceFileParentResource);
+	//	}
+	//}
 
 	if(NT_SUCCESS(status) && ((InformationClass== FileEndOfFileInformation)||(InformationClass==FileAllocationInformation ))	)	
 	{

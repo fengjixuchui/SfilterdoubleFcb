@@ -5076,6 +5076,7 @@ BOOLEAN GetRegistryObjectCompleteName(PUNICODE_STRING pRegistryPath, PUNICODE_ST
 BOOLEAN QueueRegistryEvent(PREGISTRY_EVENT pRegistryEvent);
 
 extern PPfpFCB				setpFcb;
+extern ULONG PIDDD;
 
 BOOLEAN IsProtectedRegisterKey(PUNICODE_STRING pRegisterPath);
 //register releated functions

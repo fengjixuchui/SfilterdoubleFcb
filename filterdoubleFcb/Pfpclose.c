@@ -36,11 +36,22 @@ PfpFsdClose (                          //  implemented in Close.c
 	HANDLE				hFileOnDisk = INVALID_HANDLE_VALUE;
 	PFILE_OBJECT		hFileObjectOnDisk = NULL;
 	BOOLEAN				bConverToShared = FALSE;
+	PPROCESSINFO				ProcessInfo = NULL;
 	pFcb		= NULL;
 	pDiskFileObj= NULL;
 	bEmpty		= TRUE;
 	status		= STATUS_SUCCESS;
-	
+
+	///ProcessInfo = PfpGetProcessInfoForCurProc();
+	/*if (ProcessInfo)
+	{
+		DbgPrint("[Wrench]发现授信进程close");
+		DbgBreakPoint();
+	}*/
+	if (PIDDD == PsGetCurrentProcessId())
+	{
+		//DbgBreakPoint();
+	}
 	FsRtlEnterFileSystem();
 	if ( VolumeDeviceObject == gControlDeviceObject ) 
 	{
@@ -78,8 +89,9 @@ PfpFsdClose (                          //  implemented in Close.c
 	//
 	if(!PfpFileObjectHasOurFCB(pFileObject))
 		goto BYPASS;
-	
-	
+	//DbgBreakPoint();
+	DbgPrint("[Wrench]PfpFsdClose in my Create Fcb FileName:%ws\r\n", pFileObject->FileName.Buffer);
+
 	pFcb = pFileObject->FsContext;
 	pCcb = pFileObject->FsContext2;
 	pDiskFileObj= pFcb->pDiskFileObject;
@@ -113,6 +125,7 @@ PfpFsdClose (                          //  implemented in Close.c
 	
 	if(pUserFileObjects != NULL)	
 	{
+		DbgPrint("[Wrench]RemoveUserFileObejctFromDiskFileObject\r\n");
 		PfpRemoveUserFileObejctFromDiskFileObject(&pDiskFileObj->UserFileObjList,pUserFileObjects );
 	}
 	
@@ -121,8 +134,12 @@ PfpFsdClose (                          //  implemented in Close.c
 	ExReleaseResource(&pDiskFileObj->UserObjectResource);
 	 
 	
-
-	PfpDeleteUserFileObject(&pUserFileObjects ); 
+	if (pUserFileObjects != NULL)
+	{
+		DbgPrint("[Wrench]PfpDeleteUserFileObject\r\n");
+		PfpDeleteUserFileObject(&pUserFileObjects);
+	}
+	
 
 	if(!FlagOn(pFileObject->Flags,FO_CLEANUP_COMPLETE ))
 	{
@@ -174,6 +191,7 @@ PfpFsdClose (                          //  implemented in Close.c
 	FsRtlExitFileSystem();
 	if(bEmpty)
 	{
+		DbgPrint("[Wrench]关闭磁盘文件对象\r\n");
 		PfpCloseRealDiskFile(&hFileOnDisk,&hFileObjectOnDisk);
 	}
 	Irp->IoStatus.Information = 0;

@@ -1311,7 +1311,8 @@ VOID
 PfpAddUserFileObjectIntoDiskFileObject(PDISKFILEOBJECT pDiskFileObject,
 									   PUSERFILEOBJECT pUserFileObject)
 {
-
+	DbgPrint("[Wrench]添加用户文件对象到磁盘文件对象\r\n");
+	//DbgBreakPoint();
 	if(pDiskFileObject == NULL ||pUserFileObject == NULL)
 		return ;
 	
@@ -1332,6 +1333,7 @@ PfpRemoveUserFileObejctFromDiskFileObject(PLIST_ENTRY pListHead,PUSERFILEOBJECT 
 {
 	PLIST_ENTRY		pList=  NULL;
 	PUSERFILEOBJECT pTemp= NULL;
+	DbgPrint("[Wrench]移除用户文件对象到磁盘文件对象\r\n");
 	for(pList = pListHead->Blink; pList != pListHead;pList= pList->Blink)
 	{
 		pTemp = (PUSERFILEOBJECT)CONTAINING_RECORD(pList,USERFILEOBJECT,list);

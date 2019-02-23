@@ -81,7 +81,7 @@ PfpFsdCleanup (
 	//
 	if(!PfpFileObjectHasOurFCB(IoGetCurrentIrpStackLocation(Irp)->FileObject))
 		goto BYPASS;
-	
+	DbgPrint("[Wrench]:PfpFsdCleanup is my FCB\r\n");
 
 	//
 	//  Call the common Cleanup routine
@@ -275,12 +275,13 @@ PfpCommonCleanup (                        //  implemented in Cleanup.c
 	TruncateSize.QuadPart = pFcb->Header.FileSize.QuadPart;
 	CcUninitializeCacheMap(pFileObject,&TruncateSize,NULL);
 	IoRemoveShareAccess( pFileObject, &pFcb->ShareAccess );
-
+	
 	if(!FlagOn(pCcb->Flags,CCB_FLAG_CLEANUP))
 	{	
+		KdPrint(("[Wrench]清理CCB资源计次减1\r\n"));
 		PfpDecrementCleanupCounts(pFcb,BooleanFlagOn(pFileObject->Flags,FO_NO_INTERMEDIATE_BUFFERING));
 		PfpDecreFileOpen();
-		SetFlag(pFileObject->Flags,FO_CLEANUP_COMPLETE);
+		SetFlag(pFileObject->Flags,FO_CLEANUP_COMPLETE); ///这里释放CCB资源
 		pCcb->Flags|= CCB_FLAG_CLEANUP;
 	}
 	
@@ -390,6 +391,7 @@ PfpCommonCleanup (                        //  implemented in Cleanup.c
 				if(pHandleInfo )
 				{
 					PfpDeleteCCBFromHandleOfExe(pHandleInfo,pCcb,&bHasCloseThisFile  ,&pCreatedFilewithCCb);
+
 				}
 				ExReleaseFastMutex(&pProcessInfo->HandleMutex);
 				InterlockedDecrement(&pProcessInfo->nRef);
