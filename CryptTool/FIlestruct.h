@@ -1,7 +1,6 @@
 #pragma once
-#pragma pack(4)
 #include <windows.h>
-
+#pragma pack(1)
 #define DLLTMP "C:\\Users\\Administrator\\AppData\\Local\\Temp\\copyDllHook.dll"
 #define RARTMP "C:\\Users\\Administrator\\AppData\\Local\\Temp\\Rar.exe "
 #define UNRARTMP "C:\\Users\\Administrator\\AppData\\Local\\Temp\\UnRAR.exe"
@@ -17,7 +16,10 @@ typedef struct _Time {
 
 //这个是加密后的文件写在文件头里的information
 typedef struct _RjFileSrtuct {
-	char FileHeadName[20] ; //文件头的名字
+	LONGLONG EncryptHead; //文件头的名字
+	LONGLONG FileSize;
+	LONGLONG ValidDataLength;
+	LONGLONG AllocationSize;
 	char FileSrcName [60];  //原本文件的名称
 	Time Outgoingfiletime; //文件外发时间记录
 	INT Count;//使用次数

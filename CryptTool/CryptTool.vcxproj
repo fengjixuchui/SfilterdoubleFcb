@@ -203,6 +203,7 @@
     <ClInclude Include="CryptTool.h" />
     <ClInclude Include="CryptToolDlg.h" />
     <ClInclude Include="Endian.h" />
+    <ClInclude Include="FIlestruct.h" />
     <ClInclude Include="m_CEdit.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />

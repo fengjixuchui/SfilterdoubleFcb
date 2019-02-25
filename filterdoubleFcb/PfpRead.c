@@ -300,7 +300,7 @@ NTSTATUS - The return status for the operation
 	// we do not unmap it on the way out.
 	//
 
-	
+	DbgBreakPoint();
 
 	//ASSERT_IRP_CONTEXT( IrpContext );
 	//ASSERT_IRP( Irp );
@@ -859,7 +859,7 @@ NTSTATUS - The return status for the operation
 			//  Round up to a sector boundry
 			//
 
-			BytesToRead = ((ULONG)ByteCount + (SectorSize - 1)) & ~(SectorSize - 1);
+			BytesToRead = ((ULONG)ByteCount + (SectorSize - 1)) & ~(SectorSize - 1); //×Ö½Ú¶ÔÆë
 
 			
 
@@ -921,7 +921,7 @@ NTSTATUS - The return status for the operation
 					pUserBuffer						= Irp->AssociatedIrp.SystemBuffer ;
 					Irp->AssociatedIrp.SystemBuffer = pTempBuffer;
 
-					//KdPrint( ("read   offset =%x, count = %x, %wz \n",StartingVbo ,BytesToRead,&pFcb->pDiskFileObject->FullFilePath));
+					KdPrint( ("read   offset =%x, count = %x, %wz \n",StartingVbo ,BytesToRead,&pFcb->pDiskFileObject->FullFilePath));
 					PfpNonCachedNonAlignedIo(   IrpContext,
 												Irp,
 												pFcb,
@@ -1613,6 +1613,7 @@ PfpNonCachedAsyncIoCompleteRead(
 				
 				//if (PfpGetProcessInfoForCurProc())
 				//{
+				DbgBreakPoint();
 					PfpDecryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_den_context);
 					KdPrint(("PfpNonCachedAsyncIoCompleteRead--------------DecryptBuffter-------------\r\n"));
 					KdPrint(("Read File  Byte cout :%d \r\n", (ULONG)Irp->IoStatus.Information));

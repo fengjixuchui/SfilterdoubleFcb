@@ -881,7 +881,7 @@ void PfpEncryptFile(PFILE_OBJECT pFileObject,PDEVICE_OBJECT pTargetDevice)
 		return ;
 	}
 
-	ntstatus = PfpReadHeadForEncryption(	EncryptHead,
+	ntstatus = PfpReadHeadForEncryption(EncryptHead,
 		Length,
 		pFileObject,
 		pTargetDevice,

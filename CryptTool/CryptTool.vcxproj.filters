@@ -48,6 +48,9 @@
     <ClInclude Include="Tcdefs.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="FIlestruct.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CryptTool.cpp">

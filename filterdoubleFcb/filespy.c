@@ -260,13 +260,13 @@ Return Value:
 	NtfsLarge1.LowPart =0;
 	gFileSpyAttachMode = FILESPY_ATTACH_ON_DEMAND;
 	g_ShadowDeivceName = ExAllocatePoolWithTag(PagedPool,(wcslen(L"\\Device\\ShadowDevicePfp0000")+1)*sizeof(WCHAR),'pfp0');
-	ProcName = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR), 'pfp6');
+	ProcName = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR), 'pfp6');
 	if (ProcName == NULL)
 	{
 		return STATUS_INSUFFICIENT_RESOURCES;
 	}
-	RtlZeroMemory(ProcName, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR));
-	wcscpy(ProcName, L"WPS.EXE");
+	RtlZeroMemory(ProcName, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR));
+	wcscpy(ProcName, L"NOTEPAD.EXE");
 
 	//DbgBreakPoint();
 
@@ -291,13 +291,13 @@ Return Value:
 	wcscpy(DOC, L"doc");
 
 
-	tmp = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"WPSOFFICE.EXE") + 1) * sizeof(WCHAR), 'pfp6');
+	tmp = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR), 'pfp6');
 	if (tmp == NULL)
 	{
 		return STATUS_INSUFFICIENT_RESOURCES;
 	}
-	RtlZeroMemory(tmp, (wcslen(L"WPSOFFICE.EXE") + 1) * sizeof(WCHAR));
-	wcscpy(tmp, L"WPS.EXE");
+	RtlZeroMemory(tmp, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR));
+	wcscpy(tmp, L"NOTEPAD.EXE");
 	//上面有一部分废代码
 
 	//InitData(DriverObject);

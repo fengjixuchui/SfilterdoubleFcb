@@ -4616,7 +4616,7 @@ NTSTATUS PfpCreateRealDiskFile(PDISKFILEOBJECT	pDiskFileObject,
             pDiskFileObject->bFileNOTEncypted = !PfpCheckEncryptInfo(EncryptHead,ENCRYPTIONHEADLENGTH);
             if(!pDiskFileObject->bFileNOTEncypted)
             {
-                if(!PfpInitFCBFromEncryptBuffer(EncryptHead,ENCRYPTIONHEADLENGTH,pDiskFileObject->pFCB))
+                if(!PfpInitFCBFromEncryptBuffer(EncryptHead,ENCRYPTIONHEADLENGTH,pDiskFileObject->pFCB)) //ÕâÀï£¬ÎÔ²ÛÄáÂêµÄ
                 {
                     ntstatus = STATUS_FILE_CORRUPT_ERROR;
                     goto EXIT;
