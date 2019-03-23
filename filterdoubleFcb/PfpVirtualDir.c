@@ -326,7 +326,7 @@ PpfGetDiskFileObjectFromVirtualDisk(PVIRTUALDISKFILE pVirtualDiskFile)
 				return pDiskFileObject;
 			}else
 			{
-				KdPrint(("Virtual DIsk File has other files ,so return NULL %wZ\r\n",&pVirtualDiskFile->FileName));
+				//KdPrint(("Virtual DIsk File has other files ,so return NULL %wZ\r\n",&pVirtualDiskFile->FileName));
 				bPrint = TRUE;
 			}
 		}
@@ -337,7 +337,7 @@ PpfGetDiskFileObjectFromVirtualDisk(PVIRTUALDISKFILE pVirtualDiskFile)
 		{
 			nNum ++;
 		}
-		KdPrint(("Virtual DIsk File has %d files \r\n",nNum));
+		//KdPrint(("Virtual DIsk File has %d files \r\n",nNum));
 	}
 	return NULL;
 
@@ -495,10 +495,10 @@ PfpCloseDiskFileObjectHasGoneThroughCleanUpInVirtualDiskFile(PVIRTUALDISKFILE pV
 	PLIST_ENTRY pTempList = NULL;
 	PDISKFILEOBJECT pDiskFileObeject = NULL;
 	ExAcquireResourceExclusiveLite( pVirtualDiskFileObject->pVirtualDiskLocker,TRUE);
-	KdPrint(("VirtualDiskFile function accquire file resource %Xh\r\n",pVirtualDiskFileObject->pVirtualDiskLocker));
+	//KdPrint(("VirtualDiskFile function accquire file resource %Xh\r\n",pVirtualDiskFileObject->pVirtualDiskLocker));
 	if(IsListEmpty(&pVirtualDiskFileObject->listForDiskFileObject)) 
 	{
-		KdPrint(("VirtualDiskFile function release file resource %Xh\r\n",pVirtualDiskFileObject->pVirtualDiskLocker));
+		//KdPrint(("VirtualDiskFile function release file resource %Xh\r\n",pVirtualDiskFileObject->pVirtualDiskLocker));
 		ExReleaseResourceLite(pVirtualDiskFileObject->pVirtualDiskLocker);
 		return  ;
 	}
@@ -514,7 +514,7 @@ PfpCloseDiskFileObjectHasGoneThroughCleanUpInVirtualDiskFile(PVIRTUALDISKFILE pV
 	}
 
 	ExReleaseResourceLite(pVirtualDiskFileObject->pVirtualDiskLocker);
-	KdPrint(("VirtualDiskFile function release file resource %Xh\r\n",pVirtualDiskFileObject->pVirtualDiskLocker));
+	//KdPrint(("VirtualDiskFile function release file resource %Xh\r\n",pVirtualDiskFileObject->pVirtualDiskLocker));
 }
 
 VOID 

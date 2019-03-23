@@ -147,7 +147,7 @@ DriverUnload(
     );
 #endif
 
-#ifdef ALLOC_PRAGMA
+
 
 #pragma alloc_text(INIT, DriverEntry)
 #if DBG && WINVER >= 0x0501
@@ -179,7 +179,7 @@ DriverUnload(
 #pragma alloc_text(PAGE, SpyFastIoQueryOpen)
 #pragma alloc_text(PAGE, SpyCommonDeviceIoControl)
 
-#endif
+
 
 
 
@@ -260,44 +260,44 @@ Return Value:
 	NtfsLarge1.LowPart =0;
 	gFileSpyAttachMode = FILESPY_ATTACH_ON_DEMAND;
 	g_ShadowDeivceName = ExAllocatePoolWithTag(PagedPool,(wcslen(L"\\Device\\ShadowDevicePfp0000")+1)*sizeof(WCHAR),'pfp0');
-	ProcName = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR), 'pfp6');
-	if (ProcName == NULL)
-	{
-		return STATUS_INSUFFICIENT_RESOURCES;
-	}
-	RtlZeroMemory(ProcName, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR));
-	wcscpy(ProcName, L"NOTEPAD.EXE");
+	//ProcName = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR), 'pfp6');
+	//if (ProcName == NULL)
+	//{
+	//	return STATUS_INSUFFICIENT_RESOURCES;
+	//}
+	//RtlZeroMemory(ProcName, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR));
+	//wcscpy(ProcName, L"NOTEPAD.EXE");
 
-	//DbgBreakPoint();
-
-
+	////DbgBreakPoint();
 
 
-	DOCX = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"docx") + 1) * sizeof(WCHAR), 'pfp0');
-	if (DOCX == NULL)
-	{
-		return STATUS_INSUFFICIENT_RESOURCES;
-	}
-	RtlZeroMemory(DOCX, (wcslen(L"docx") + 1) * sizeof(WCHAR));
-	wcscpy(DOCX, L"docx");
 
 
-	DOC = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"doc") + 1) * sizeof(WCHAR), 'pfp0');
-	if (DOC == NULL)
-	{
-		return STATUS_INSUFFICIENT_RESOURCES;
-	}
-	RtlZeroMemory(DOC, (wcslen(L"doc") + 1) * sizeof(WCHAR));
-	wcscpy(DOC, L"doc");
+	//DOCX = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"docx") + 1) * sizeof(WCHAR), 'pfp0');
+	//if (DOCX == NULL)
+	//{
+	//	return STATUS_INSUFFICIENT_RESOURCES;
+	//}
+	//RtlZeroMemory(DOCX, (wcslen(L"docx") + 1) * sizeof(WCHAR));
+	//wcscpy(DOCX, L"docx");
 
 
-	tmp = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR), 'pfp6');
-	if (tmp == NULL)
-	{
-		return STATUS_INSUFFICIENT_RESOURCES;
-	}
-	RtlZeroMemory(tmp, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR));
-	wcscpy(tmp, L"WPS.EXE");
+	//DOC = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"doc") + 1) * sizeof(WCHAR), 'pfp0');
+	//if (DOC == NULL)
+	//{
+	//	return STATUS_INSUFFICIENT_RESOURCES;
+	//}
+	//RtlZeroMemory(DOC, (wcslen(L"doc") + 1) * sizeof(WCHAR));
+	//wcscpy(DOC, L"doc");
+
+
+	//tmp = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR), 'pfp6');
+	//if (tmp == NULL)
+	//{
+	//	return STATUS_INSUFFICIENT_RESOURCES;
+	//}
+	//RtlZeroMemory(tmp, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR));
+	//wcscpy(tmp, L"WPS.EXE");
 	//上面有一部分废代码
 
 	//InitData(DriverObject);
@@ -2470,7 +2470,7 @@ Return Value:
 													CheckForReadOperation,
 													IoStatus,
 													deviceObject);
-			KdPrint(("PfpFastIoCheckIfPossible->returnValue:%d\r\n", returnValue));
+			//KdPrint(("PfpFastIoCheckIfPossible->returnValue:%d\r\n", returnValue));
 		}
         else
 		{
@@ -2592,7 +2592,7 @@ Return Value:
 								Buffer,
 								IoStatus,
 								DeviceObject);
-					//KdPrint(("SpyFastIoRead->Buffer:%p\r\n", Buffer));
+					////KdPrint(("SpyFastIoRead->Buffer:%p\r\n", Buffer));
 			}
 		}
         else
@@ -2753,7 +2753,7 @@ Return Value:
 										IoStatus,
 										DeviceObject);
 
-			KdPrint(("SpyFastIoWrite->Buffer:%p\r\n", Buffer));
+			//KdPrint(("SpyFastIoWrite->Buffer:%p\r\n", Buffer));
 		}
 		else
 		{
@@ -2887,7 +2887,7 @@ Return Value:
 			//{
 
 			//}
-			//KdPrint(("SpyFastIoQueryBasicInfo->Buffer:%p\r\n", Buffer));
+			////KdPrint(("SpyFastIoQueryBasicInfo->Buffer:%p\r\n", Buffer));
 
 		}else
 
@@ -2981,7 +2981,7 @@ Return Value:
 												Buffer,
 												IoStatus,
 												deviceObject);
-			//KdPrint(("SpyFastIoQueryStandardInfo->Buffer:%p\r\n", Buffer));
+			////KdPrint(("SpyFastIoQueryStandardInfo->Buffer:%p\r\n", Buffer));
 		}else
 		{
 			fastIoDispatch = deviceObject->DriverObject->FastIoDispatch;
@@ -3583,7 +3583,7 @@ Return Value:
 			}
 			if(g_UsbDeviceSignal)
 			{
-				KdPrint(("set event in FastioDetach\r\n"));
+				//KdPrint(("set event in FastioDetach\r\n"));
 				KeSetEvent(g_UsbDeviceSignal ,IO_NO_INCREMENT, FALSE);
 			}
 		}
@@ -3765,7 +3765,7 @@ Return Value:
 										MdlChain,
 										IoStatus,
 										DeviceObject);
-			KdPrint(("SpyFastIoMdlRead->MdlChain:%p FileOffset:%d\r\n", MdlChain,FileOffset));
+			//KdPrint(("SpyFastIoMdlRead->MdlChain:%p FileOffset:%d\r\n", MdlChain,FileOffset));
 	
 		}
 		else
@@ -3851,7 +3851,7 @@ Return Value:
 			returnValue = FsRtlMdlReadCompleteDev ( FileObject,										
 													MdlChain,										
 													DeviceObject);
-			KdPrint(("SpyFastIoMdlReadComplete->MdlChain:%p\r\n", MdlChain));
+			//KdPrint(("SpyFastIoMdlReadComplete->MdlChain:%p\r\n", MdlChain));
 		}
 		else
 		{
@@ -3944,7 +3944,7 @@ Return Value:
 												MdlChain,
 												IoStatus,
 												deviceObject);
-			KdPrint(("SpyFastIoPrepareMdlWrite->MdlChain:%p FileOffset:%d\r\n", MdlChain, FileOffset));
+			//KdPrint(("SpyFastIoPrepareMdlWrite->MdlChain:%p FileOffset:%d\r\n", MdlChain, FileOffset));
 		}
 		else
 		
@@ -4032,7 +4032,7 @@ Return Value:
 													FileOffset,
 													MdlChain,
 													deviceObject);
-			KdPrint(("SpyFastIoMdlWriteComplete->MdlChain:%p FileOffset:%d\r\n", MdlChain, FileOffset));
+			//KdPrint(("SpyFastIoMdlWriteComplete->MdlChain:%p FileOffset:%d\r\n", MdlChain, FileOffset));
 
 		}
         else
@@ -4540,7 +4540,7 @@ Return Value:
 			//if (wcswcs(imageName, ProcName) != NULL|| wcswcs(imageName, tmp) != NULL)
 			//{
 			//	ExFreePool(imageName);
-			//	KdPrint(("发现 wps.exe\r\n"));
+			//	//KdPrint(("发现 wps.exe\r\n"));
 			//}
 			//else {
 			//	/*	ExFreePool(imageName);
@@ -4555,7 +4555,7 @@ Return Value:
 
 
 			ExAcquireResourceSharedLite( pVirtualDiskFile->pVirtualDiskLocker,TRUE);
-			//KdPrint(("SpyFastIoQueryOpen function accquire file resource %Xh\r\n",pVirtualDiskFile->pVirtualDiskLocker));
+			////KdPrint(("SpyFastIoQueryOpen function accquire file resource %Xh\r\n",pVirtualDiskFile->pVirtualDiskLocker));
 			pDiskFileObject= PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile);
 			
 			if(pDiskFileObject)
@@ -4589,7 +4589,7 @@ Return Value:
 				NetworkInformation->FileAttributes	= pFcb->Attribute;
 				bFound = TRUE;
 			}
-			//KdPrint(("SpyFastIoQueryOpen function release file resource %Xh\r\n",pVirtualDiskFile->pVirtualDiskLocker));
+			////KdPrint(("SpyFastIoQueryOpen function release file resource %Xh\r\n",pVirtualDiskFile->pVirtualDiskLocker));
 			ExReleaseResource(pVirtualDiskFile->pVirtualDiskLocker);
 			
 		}

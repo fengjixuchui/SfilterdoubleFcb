@@ -360,7 +360,7 @@ VOID Insertlist(IN HANDLE pid, ULONG cout, IN OUT LIST_ENTRY &linkListHead ,IN K
 	KIRQL irql = NULL;
 
 
-	KdPrint(("[Wrench] Begin insert to link list"));
+	//KdPrint(("[Wrench] Begin insert to link list"));
 
 
 	KeAcquireSpinLock(&my_spin_lock, &irql);
@@ -389,7 +389,7 @@ VOID Removelist(IN  LIST_ENTRY &linklist , IN KSPIN_LOCK &my_spin_lock)
 
 	PGloballinklist pData;
 	KIRQL irql = NULL;
-	KdPrint(("[Wrench] 开始移除链接链表\n"));
+	//KdPrint(("[Wrench] 开始移除链接链表\n"));
 
 	KeAcquireSpinLock(&my_spin_lock, &irql);
 
@@ -399,7 +399,7 @@ VOID Removelist(IN  LIST_ENTRY &linklist , IN KSPIN_LOCK &my_spin_lock)
 
 		PLIST_ENTRY pEntry = RemoveTailList(&linklist); //
 		pData = CONTAINING_RECORD(pEntry, Globallinklist, ListEntry);
-		KdPrint(("[Wrench]正在删除此pid为:%d这个链表块的数据\n", pData->pid));
+		//KdPrint(("[Wrench]正在删除此pid为:%d这个链表块的数据\n", pData->pid));
 		ExFreePool(pData);
 	}
 	KeReleaseSpinLock(&my_spin_lock, irql);
@@ -413,7 +413,7 @@ BOOLEAN Querylist(IN HANDLE Pid, IN PGloballinklist pData, OUT LIST_ENTRY &ListE
 	KIRQL irql = NULL;
 	if (Pid == pData->pid) {
 		ListEntry = pData->ListEntry;
-		KdPrint(("[Wrench]The Pid is opend\n"));
+		//KdPrint(("[Wrench]The Pid is opend\n"));
 		return TRUE;
 	}
 	else {
@@ -423,12 +423,12 @@ BOOLEAN Querylist(IN HANDLE Pid, IN PGloballinklist pData, OUT LIST_ENTRY &ListE
 				pData = (PGloballinklist)pData->ListEntry.Flink;
 			}
 			else {
-				KdPrint(("no get...\n"));
+				//KdPrint(("no get...\n"));
 				return FALSE;
 			}
 			if (Pid == pData->pid) {
 				ListEntry = pData->ListEntry;
-				KdPrint(("[Wrench] Find process is opend\n"));
+				//KdPrint(("[Wrench] Find process is opend\n"));
 				return TRUE;
 			}
 		}

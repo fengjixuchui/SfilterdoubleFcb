@@ -126,7 +126,7 @@ PfpFsdCleanup (
 			//  the error status that we get back from the
 			//  execption code
 			//
-			KdPrint(("Cleanup function exception\r\n"));
+			//KdPrint(("Cleanup function exception\r\n"));
 			Status = PfpProcessException( IrpContext, Irp, GetExceptionCode() );
 		}
 
@@ -198,10 +198,10 @@ PfpCommonCleanup (                        //  implemented in Cleanup.c
 	pCcb = (PPfpCCB)pFileObject->FsContext2;	
 
 	ExAcquireResourceExclusiveLite(((PVIRTUALDISKFILE)pDiskFileObj->pVirtualDiskFile)->pVirtualDiskLocker,TRUE	);
-	KdPrint(("Cleanup function accquire file resource %Xh\r\n",((PVIRTUALDISKFILE)pDiskFileObj->pVirtualDiskFile)->pVirtualDiskLocker));
+	//KdPrint(("Cleanup function accquire file resource %Xh\r\n",((PVIRTUALDISKFILE)pDiskFileObj->pVirtualDiskFile)->pVirtualDiskLocker));
 	ExAcquireResourceExclusiveLite(pFcb->Header.Resource,TRUE);
 
-	//KdPrint (("in cleanup fileobejct %wZ\n",&pDiskFileObj->FullFilePath));
+	////KdPrint (("in cleanup fileobejct %wZ\n",&pDiskFileObj->FullFilePath));
 
 	try
 	{
@@ -220,7 +220,7 @@ PfpCommonCleanup (                        //  implemented in Cleanup.c
 
 	}except(PfpExceptionFilter( IrpContext, GetExceptionInformation() )) 
 	{
-		KdPrint(("Cleanup function exception\r\n"));
+		//KdPrint(("Cleanup function exception\r\n"));
 	}
 	
 	//
@@ -278,7 +278,7 @@ PfpCommonCleanup (                        //  implemented in Cleanup.c
 	
 	if(!FlagOn(pCcb->Flags,CCB_FLAG_CLEANUP))
 	{	
-		KdPrint(("[Wrench]清理CCB资源计次减1\r\n"));
+		//KdPrint(("[Wrench]清理CCB资源计次减1\r\n"));
 		PfpDecrementCleanupCounts(pFcb,BooleanFlagOn(pFileObject->Flags,FO_NO_INTERMEDIATE_BUFFERING));
 		PfpDecreFileOpen();
 		SetFlag(pFileObject->Flags,FO_CLEANUP_COMPLETE); ///这里释放CCB资源
@@ -310,7 +310,7 @@ PfpCommonCleanup (                        //  implemented in Cleanup.c
 					IrpContext->pNextDevice);
 			}except(PfpExceptionFilter( IrpContext, GetExceptionInformation() )) 
 			{
-				KdPrint(("Cleanup function exception\r\n"));
+				//KdPrint(("Cleanup function exception\r\n"));
 			}
 		}
 		
@@ -371,7 +371,7 @@ PfpCommonCleanup (                        //  implemented in Cleanup.c
 		}  
 	}except(PfpExceptionFilter( IrpContext, GetExceptionInformation() )) 
 	{
-		KdPrint(("Cleanup function exception\r\n"));
+		//KdPrint(("Cleanup function exception\r\n"));
 	}
 
 	try
@@ -410,12 +410,12 @@ PfpCommonCleanup (                        //  implemented in Cleanup.c
 		}
 	}except(PfpExceptionFilter( IrpContext, GetExceptionInformation() )) 
 	{
-		KdPrint(("Cleanup function exception\r\n"));
+		//KdPrint(("Cleanup function exception\r\n"));
 	}
 	//ExFreePool_A(pCcb);
 
 	ExReleaseResourceLite(((PVIRTUALDISKFILE)pDiskFileObj->pVirtualDiskFile)->pVirtualDiskLocker);
-	KdPrint(("Cleanup function release file resource %Xh\r\r",((PVIRTUALDISKFILE)pDiskFileObj->pVirtualDiskFile)->pVirtualDiskLocker));
+	//KdPrint(("Cleanup function release file resource %Xh\r\r",((PVIRTUALDISKFILE)pDiskFileObj->pVirtualDiskFile)->pVirtualDiskLocker));
 	Irp->IoStatus.Information = 0;
 	Irp->IoStatus.Status	  = status;
 

@@ -429,7 +429,7 @@ ReplaceHardDeviceNameWithDos(PUNICODE_STRING ProcessImageName)
 	if(ProcessImageName->Buffer[0]!= L'\\')
 		return;
 
-	//KdPrint(("Process path convert before %wZ\r\n",ProcessImageName));
+	////KdPrint(("Process path convert before %wZ\r\n",ProcessImageName));
 // 	for(;n<ProcessImageName->Length/sizeof(WCHAR);n++)
 // 	{
 // 		if(ProcessImageName->Buffer[n]==L'\\')
@@ -464,7 +464,7 @@ ReplaceHardDeviceNameWithDos(PUNICODE_STRING ProcessImageName)
 			ProcessImageName->Length =(USHORT) (ProcessImageName->Length-sizeof(WCHAR)*IndexHardLink+sizeof(WCHAR)*2);
 		}
 	}
-	//KdPrint(("Process path convert After %wZ\r\n",ProcessImageName));
+	////KdPrint(("Process path convert After %wZ\r\n",ProcessImageName));
 	//	ExFreePool(pszHardPart);
 /*	}*/
 }
@@ -490,7 +490,7 @@ BOOLEAN	VFSVolumeDeviceToDosNameEx(UNICODE_STRING DeviceHardLinkPath,WCHAR* Driv
 		LinkTarget.Buffer=Buffer;
 		LinkTarget.MaximumLength=128;
 		LinkTarget.Length=wcslen(LinkTarget.Buffer)*sizeof(WCHAR);
-		//KdPrint(("VFSVolumeDeviceToDosName:LinkName=%wZ,QuerySymNmae=%wZ\n",&LinkTarget,&DeviceObjectName.UnicodeName));
+		////KdPrint(("VFSVolumeDeviceToDosName:LinkName=%wZ,QuerySymNmae=%wZ\n",&LinkTarget,&DeviceObjectName.UnicodeName));
 		if(DeviceHardLinkPath.Length>=LinkTarget.Length)
 		{
 			LinkTargetTemp.Buffer = DeviceHardLinkPath.Buffer;
@@ -534,7 +534,7 @@ BOOLEAN	VFSVolumeDeviceToDosName(UNICODE_STRING DeviceHardLink,WCHAR* DriveLette
 		LinkTarget.Buffer=Buffer;
 		LinkTarget.MaximumLength=128;
 		LinkTarget.Length=wcslen(LinkTarget.Buffer)*sizeof(WCHAR);
-		//KdPrint(("VFSVolumeDeviceToDosName:LinkName=%wZ,QuerySymNmae=%wZ\n",&LinkTarget,&DeviceObjectName.UnicodeName));
+		////KdPrint(("VFSVolumeDeviceToDosName:LinkName=%wZ,QuerySymNmae=%wZ\n",&LinkTarget,&DeviceObjectName.UnicodeName));
 		if(RtlEqualUnicodeString(&LinkTarget,&DeviceHardLink,TRUE)) 
 			break; 
 	} 

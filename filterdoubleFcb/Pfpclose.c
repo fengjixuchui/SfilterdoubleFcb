@@ -166,7 +166,7 @@ PfpFsdClose (                          //  implemented in Close.c
 
 			if(pDiskFileObj->pVirtualDiskFile == NULL)//这里说明这个diskfileobject 已经和virtualdiskfile 断开了
 			{
-				KdPrint(("there is a file dettached from VirtualDiskFile Object and handled by layzewriter %wZ\r\n",&pDiskFileObj->FileNameOnDisk));
+				//KdPrint(("there is a file dettached from VirtualDiskFile Object and handled by layzewriter %wZ\r\n",&pDiskFileObj->FileNameOnDisk));
 				PfpDeleteDiskFileObject(&pDiskFileObj);
 			}else
 			{
@@ -287,7 +287,7 @@ PfpSetFileInforByIrp(PFILE_OBJECT hFileObject,PUCHAR pBuffer,ULONG len,FILE_INFO
 	}
 	except(EXCEPTION_EXECUTE_HANDLER) 
 	{
-		KdPrint(("PfpSetFileInforByIrp function exception\r\n"));
+		//KdPrint(("PfpSetFileInforByIrp function exception\r\n"));
 	}
 	////VirtualizerEnd();
 	ntstatus= Irp->IoStatus.Status;

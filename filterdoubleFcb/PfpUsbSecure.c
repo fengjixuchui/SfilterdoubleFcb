@@ -777,7 +777,7 @@ VOID PfpInitUsbDeviceWithSecure(PDEVICE_OBJECT pOurDevice)
 	}
 	
 	ObReferenceObject( pOurDevice );
-	KdPrint(("send message to thread\r\n"));
+	//KdPrint(("send message to thread\r\n"));
 	 
 	
 	PsCreateSystemThread(&handle ,
@@ -829,7 +829,7 @@ VOID PfpInitUsbDeviceWithSecure(PDEVICE_OBJECT pOurDevice)
 		//  Queue the work item so that it will be run in a
 		//  worker thread at some point.
 		//
-		KdPrint(("send message to thread\r\n"));
+		//KdPrint(("send message to thread\r\n"));
 		ExQueueWorkItem( &completionContext->WorkItem ,DelayedWorkQueue );
 	}*/
 }
@@ -854,19 +854,19 @@ PfpUsbInitSecureWorker (
 			&DosName);
 		if(!NT_SUCCESS(status ))
 		{
-			KdPrint(("Failed to get dos name from IoVolumeDeviceToDosName \r\n"));
+			//KdPrint(("Failed to get dos name from IoVolumeDeviceToDosName \r\n"));
 			ObDereferenceObject(pOurDevice);
 			return ;
 		}else
 		{
-			KdPrint(("Get dos name from IoVolumeDeviceToDosName \r\n"));
+			//KdPrint(("Get dos name from IoVolumeDeviceToDosName \r\n"));
 			memcpy(szDriverLetter,DosName.Buffer,2*sizeof(WCHAR));
 			ExFreePool(DosName.Buffer);
 		}
 	}
 	
 
-	KdPrint(("receved message \r\n"));
+	//KdPrint(("receved message \r\n"));
 
 
 	DevExt->nSerialNumber = GetVolumeSerialNumber(szDriverLetter);
@@ -925,12 +925,12 @@ PfpUsbInitSecureWorker (
 	
 	if(pUsbSecItem && g_UsbDeviceSignal)
 	{
-		KdPrint(("set event\r\n"));
+		//KdPrint(("set event\r\n"));
 
 		KeSetEvent(g_UsbDeviceSignal ,IO_NO_INCREMENT, FALSE);
 	}else
 	{
-		KdPrint(("not set evnet due to (pUsbSecItem && g_UsbDeviceSignal)!= TRUE\r\n"));
+		//KdPrint(("not set evnet due to (pUsbSecItem && g_UsbDeviceSignal)!= TRUE\r\n"));
 
 	}
 	PsTerminateSystemThread(0);

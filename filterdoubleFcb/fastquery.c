@@ -584,7 +584,7 @@ PfpFastAcquireForCreateSection (
 	}
 	else
 	{	
-		KdPrint(("PfpFastAcquireForCreateSection->Buffer:%p", ((PPfpFCB)FileObject->FsContext)->Header.Resource));
+		//KdPrint(("PfpFastAcquireForCreateSection->Buffer:%p", ((PPfpFCB)FileObject->FsContext)->Header.Resource));
 		ExAcquireResourceExclusive(((PPfpFCB)FileObject->FsContext)->Header.Resource,TRUE);
 	}
 }
@@ -606,7 +606,7 @@ PfpFastReleaseForCreateSection (
 	{	
 		if(ExIsResourceAcquiredLite(((PPfpFCB)FileObject->FsContext)->Header.Resource))
 		{
-			KdPrint(("PfpFastReleaseForCreateSection->Buffer:%p", ((PPfpFCB)FileObject->FsContext)->Header.Resource));
+			//KdPrint(("PfpFastReleaseForCreateSection->Buffer:%p", ((PPfpFCB)FileObject->FsContext)->Header.Resource));
 			ExReleaseResource(((PPfpFCB)FileObject->FsContext)->Header.Resource);	 
 		}
 	}

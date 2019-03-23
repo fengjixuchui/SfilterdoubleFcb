@@ -1060,7 +1060,7 @@ NTSTATUS PfpCommonWrite(PIRP_CONTEXT irpContext,PIRP Irp)
 											);
 					}except (PfpExceptionFilter ( irpContext, GetExceptionInformation()))
 					{
-						KdPrint(  ("NtfsCommonWrite -> %08lx\n", NTStatus) );
+						//KdPrint(  ("NtfsCommonWrite -> %08lx\n", NTStatus) );
 					}
 				}
 				else
@@ -1141,7 +1141,7 @@ NTSTATUS PfpCommonWrite(PIRP_CONTEXT irpContext,PIRP Irp)
 					memcpy(szdebug,pSyncBufferEncrypt,88);
 					StartingOffset +=ENCRYPTIONHEADLENGTH;				
 				
-					KdPrint (("in write %wZ offset %u size %u\n",&pFcb->pDiskFileObject->FullFilePath,(ULONG)StartingOffset,BytesToWrite));
+					//KdPrint (("in write %wZ offset %u size %u\n",&pFcb->pDiskFileObject->FullFilePath,(ULONG)StartingOffset,BytesToWrite));
 					if(!bWait && !PagingIoResourceAcquired )
 					{						
 						irpContext->Union.NtfsIoContext->Wait.Async.Resource = NULL;
@@ -1157,7 +1157,7 @@ NTSTATUS PfpCommonWrite(PIRP_CONTEXT irpContext,PIRP Irp)
 
 					}except (PfpExceptionFilter ( irpContext, GetExceptionInformation()))
 					{
-						KdPrint(  ("NtfsCommonWrite -> %08lx\n", NTStatus) );
+						//KdPrint(  ("NtfsCommonWrite -> %08lx\n", NTStatus) );
 					}
 					
 					if(NTStatus== STATUS_SUCCESS ||NTStatus== STATUS_PENDING)
@@ -1419,7 +1419,7 @@ NTSTATUS PfpCommonWrite(PIRP_CONTEXT irpContext,PIRP Irp)
 			//
 			// Do the write, possibly writing through
 			//
-		//	KdPrint (("in write cache %wZ offset %u size %u\n",&pFcb->pDiskFileObject->FullFilePath,(ULONG)StartingOffset,ByteCount));
+		//	//KdPrint (("in write cache %wZ offset %u size %u\n",&pFcb->pDiskFileObject->FullFilePath,(ULONG)StartingOffset,ByteCount));
 			if (!CcCopyWrite( pFileObject,
 							(PLARGE_INTEGER)&StartingOffset,
 							(ULONG)ByteCount,
@@ -1455,7 +1455,7 @@ NTSTATUS PfpCommonWrite(PIRP_CONTEXT irpContext,PIRP Irp)
 			//
 
 			ASSERT(Irp->MdlAddress == NULL);
-			//KdPrint (("in write cache %wZ offset %u size %u\n",&pFcb->pDiskFileObject->FullFilePath,(ULONG)StartingOffset,ByteCount));
+			////KdPrint (("in write cache %wZ offset %u size %u\n",&pFcb->pDiskFileObject->FullFilePath,(ULONG)StartingOffset,ByteCount));
 			CcPrepareMdlWrite( pFileObject,
 								(PLARGE_INTEGER)&StartingOffset,
 								(ULONG)ByteCount,
@@ -1686,7 +1686,7 @@ try_exit: NOTHING;
 			}
 		}else
 		{
-			KdPrint(  ("NtfsCommonWrite -> %08lx\n", NTStatus) );
+			//KdPrint(  ("NtfsCommonWrite -> %08lx\n", NTStatus) );
 		}
 
 		//DebugTrace( -1, Dbg, ("NtfsCommonWrite -> %08lx\n", NTStatus) );

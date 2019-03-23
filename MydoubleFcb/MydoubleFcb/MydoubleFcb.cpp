@@ -129,62 +129,62 @@ int _tmain(int argc, _TCHAR* argv[])
 					&ReturnLength,
 					NULL);
 				delete BufferData;
-				if (IsOk == TRUE)
-				{
-					printf("Finish double please Input AnyKey\r\n");
-					system("pause");
-                    ZeroMemory(promInfo,sizeof(ConfigData));
-					UCHAR hashValue[513] = "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111222222222222"; 
-                    WCHAR szEXEPath []  = L"C:\\Windows\\System32\\notepad.exe";
-                     promInfo->bAbone= 0;
-                     promInfo->bAllowInherent = 0;
-					 promInfo->bBackup = 0;
-					 promInfo->bBrowser = 0;
-					 promInfo->bCreateExeFile = 0;
-					 promInfo->bEnableEncrypt = TRUE;
-					 promInfo->bForceEncryption = TRUE;  //强制加密类型
-					 promInfo->BrowserEncryptTypeValue = 0;
-					 CopyMemory(promInfo->EXEHashValue,hashValue,512);
-					 promInfo->nNextOffset = 0x1314;
-					 promInfo->szBytesOfFileTypes = 3;
-					 CopyMemory(promInfo->szEXEPath,szEXEPath,512);
-                    // promInfo->szFileTypes = "1";
-                  
-					IsOk = DeviceIoControl(DeviceHandle, PFPCOMMAND_AddPrograms,
-						(LPVOID)promInfo,
-						sizeof(ConfigData),
-						(LPVOID)outbuffter,
-						sizeof(outbuffter),
-						&ReturnLength,
-						NULL);
-					    free(promInfo) ;
-					    free(outbuffter) ;
-					if (IsOk == TRUE)
-					{  
-                       ZeroMemory(FoledrInfo->szFolderPath,1024);
-					   ZeroMemory(FoledrInfo ->FolderProtectInfo.szDisplayName,50);
-                       CopyMemory(FoledrInfo->szFolderPath,_T("C:\\1111"),1024);
-                       FoledrInfo->FolderProtectInfo.bBackup = NULL;
-                       FoledrInfo->FolderProtectInfo.bEncryptRealTime = NULL;
-                       FoledrInfo ->FolderProtectInfo.EncryptForFileTypes = 0; //0是文件夹所有加密 1是指定加密对应的文件类型 2好像都不加密
-					   FoledrInfo ->FolderProtectInfo.State = 1; //0是锁定文件夹禁止访问  1是解锁文件夹
-					   CopyMemory(FoledrInfo ->FolderProtectInfo.szDisplayName,"1111",50);
-                       FoledrInfo ->FolderProtectInfo.Type = NOACCESS_VISABLE;
-					   IsOk = DeviceIoControl(DeviceHandle, PFPCOMMAND_AddFolderProtectionInfo,
-						   (LPVOID)FoledrInfo,
-						   sizeof(ADDPROTECTEDFOLDER),
-						   (LPVOID)outbuffter,
-						   sizeof(outbuffter),
-						   &ReturnLength,
-						   NULL);
-					   free(FoledrInfo);
-                      printf("DeviceIoControl is Finished\r\n");
-					}else{
-					  Funcerr("PFPCOMMAND_AddPrograms",IsOk);
-					}
-				}else{
-					  Funcerr("PFPCOMMAND_SetEncryptKey",IsOk);
-				}
+				//if (IsOk == TRUE)
+				//{
+				//	printf("Finish double please Input AnyKey\r\n");
+				//	system("pause");
+    //                ZeroMemory(promInfo,sizeof(ConfigData));
+				//	UCHAR hashValue[513] = "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111222222222222"; 
+    //                WCHAR szEXEPath []  = L"C:\\Windows\\System32\\notepad.exe";
+    //                 promInfo->bAbone= 0;
+    //                 promInfo->bAllowInherent = 0;
+				//	 promInfo->bBackup = 0;
+				//	 promInfo->bBrowser = 0;
+				//	 promInfo->bCreateExeFile = 0;
+				//	 promInfo->bEnableEncrypt = TRUE;
+				//	 promInfo->bForceEncryption = TRUE;  //强制加密类型
+				//	 promInfo->BrowserEncryptTypeValue = 0;
+				//	 CopyMemory(promInfo->EXEHashValue,hashValue,512);
+				//	 promInfo->nNextOffset = 0x1314;
+				//	 promInfo->szBytesOfFileTypes = 3;
+				//	 CopyMemory(promInfo->szEXEPath,szEXEPath,512);
+    //                // promInfo->szFileTypes = "1";
+    //              
+				//	IsOk = DeviceIoControl(DeviceHandle, PFPCOMMAND_AddPrograms,
+				//		(LPVOID)promInfo,
+				//		sizeof(ConfigData),
+				//		(LPVOID)outbuffter,
+				//		sizeof(outbuffter),
+				//		&ReturnLength,
+				//		NULL);
+				//	    free(promInfo) ;
+				//	    free(outbuffter) ;
+				//	if (IsOk == TRUE)
+				//	{  
+    //                   ZeroMemory(FoledrInfo->szFolderPath,1024);
+				//	   ZeroMemory(FoledrInfo ->FolderProtectInfo.szDisplayName,50);
+    //                   CopyMemory(FoledrInfo->szFolderPath,_T("C:\\1111"),1024);
+    //                   FoledrInfo->FolderProtectInfo.bBackup = NULL;
+    //                   FoledrInfo->FolderProtectInfo.bEncryptRealTime = NULL;
+    //                   FoledrInfo ->FolderProtectInfo.EncryptForFileTypes = 0; //0是文件夹所有加密 1是指定加密对应的文件类型 2好像都不加密
+				//	   FoledrInfo ->FolderProtectInfo.State = 1; //0是锁定文件夹禁止访问  1是解锁文件夹
+				//	   CopyMemory(FoledrInfo ->FolderProtectInfo.szDisplayName,"1111",50);
+    //                   FoledrInfo ->FolderProtectInfo.Type = NOACCESS_VISABLE;
+				//	   IsOk = DeviceIoControl(DeviceHandle, PFPCOMMAND_AddFolderProtectionInfo,
+				//		   (LPVOID)FoledrInfo,
+				//		   sizeof(ADDPROTECTEDFOLDER),
+				//		   (LPVOID)outbuffter,
+				//		   sizeof(outbuffter),
+				//		   &ReturnLength,
+				//		   NULL);
+				//	   free(FoledrInfo);
+    //                  printf("DeviceIoControl is Finished\r\n");
+				//	}else{
+				//	  Funcerr("PFPCOMMAND_AddPrograms",IsOk);
+				//	}
+				//}else{
+				//	  Funcerr("PFPCOMMAND_SetEncryptKey",IsOk);
+				//}
 			}		
 	
 	if (DeviceHandle != NULL)

@@ -61,7 +61,7 @@ FsDirectoryControl(IN PDEVICE_OBJECT DeviceObject,
 		goto PASSTHROUGH;
 	}
 	
-	//KdPrint(("PASSTHROUGH compare %ws %d \n",irpSp->FileObject->FileName.Buffer,irpSp->Parameters.QueryDirectory.FileInformationClass));
+	////KdPrint(("PASSTHROUGH compare %ws %d \n",irpSp->FileObject->FileName.Buffer,irpSp->Parameters.QueryDirectory.FileInformationClass));
 	
 	if (FileBothDirectoryInformation != irpSp->Parameters.QueryDirectory.FileInformationClass && 
 		FileIdBothDirectoryInformation!=irpSp->Parameters.QueryDirectory.FileInformationClass&& 
@@ -1018,7 +1018,7 @@ IS_MY_HIDE_OBJECT_EX(const WCHAR *pFolerPathWithBackSplash, ULONG FolderLenth,co
 
 	if((NameLenth==2&& pItemName[0]==L'.')||(NameLenth==4&& pItemName[0]==L'.' && pItemName[1]==L'.'))
 		return FALSE;
-	//KdPrint(("compare %ws \n",Name));
+	////KdPrint(("compare %ws \n",Name));
 	if (IsListEmpty(&g_HideObjHead)&&IsListEmpty(&g_FolderProtectList))
 	{
 		return FALSE;
@@ -1193,7 +1193,7 @@ AddHideObject(PWCHAR Name, ULONG Flag)
 	}
 	 
 	 
-	//sKdPrint(("Add Hide Obj:%ws", Name));
+	//s//KdPrint(("Add Hide Obj:%ws", Name));
 }
 
 ULONG 
@@ -1362,7 +1362,7 @@ PfpGetHideLen(PVOID OutPutBuffer,IO_STATUS_BLOCK*IoStatus,ULONG Flag)
 	PHIDE_FILE	newHideObj;
 	PLIST_ENTRY pList = NULL;
 	ULONG		Len=0;
-	//KdPrint(("Delete Hide Obj:%ws", Name));
+	////KdPrint(("Delete Hide Obj:%ws", Name));
 
 	if(IsListEmpty(&g_HideObjHead))
 		return ;
@@ -1392,7 +1392,7 @@ PfpGetHides(PVOID OutPutBuffer,ULONG inuputLen,IO_STATUS_BLOCK*IoStatus,ULONG Fl
 	PLIST_ENTRY pList = NULL;
 	ULONG		Len=0;
 	PWCHAR		pTemp = NULL;
-	//KdPrint(("Delete Hide Obj:%ws", Name));
+	////KdPrint(("Delete Hide Obj:%ws", Name));
 	WCHAR		szMark[1]={L'|'};
 
 	UNREFERENCED_PARAMETER(inuputLen);
@@ -1583,7 +1583,7 @@ PfpSetHideItemState(IN PHIDDERITEM pItem)
 	ULONG ObjFlag = pItem->bDir?CDO_FLAG_DIRECTORY:CDO_FLAG_FILE;
 	ULONG		nLen = wcslen(pItem->szFullPath);
 	NTSTATUS	nStatus = STATUS_INVALID_PARAMETER;
-	//KdPrint(("compare %ws \n",Name));
+	////KdPrint(("compare %ws \n",Name));
 	if (IsListEmpty(&g_HideObjHead))
 	{
 		return STATUS_SUCCESS;

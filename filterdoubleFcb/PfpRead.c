@@ -921,7 +921,7 @@ NTSTATUS - The return status for the operation
 					pUserBuffer						= Irp->AssociatedIrp.SystemBuffer ;
 					Irp->AssociatedIrp.SystemBuffer = pTempBuffer;
 
-					KdPrint( ("read   offset =%x, count = %x, %wz \n",StartingVbo ,BytesToRead,&pFcb->pDiskFileObject->FullFilePath));
+					//KdPrint( ("read   offset =%x, count = %x, %wz \n",StartingVbo ,BytesToRead,&pFcb->pDiskFileObject->FullFilePath));
 					PfpNonCachedNonAlignedIo(   IrpContext,
 												Irp,
 												pFcb,
@@ -947,7 +947,7 @@ NTSTATUS - The return status for the operation
 					Irp->AssociatedIrp.SystemBuffer = pUserBuffer;
 
 					Irp->IoStatus.Information = RequestedByteCount;
-					KdPrint(("Irp->IoStatus.Information :%d \r\n", RequestedByteCount));
+					//KdPrint(("Irp->IoStatus.Information :%d \r\n", RequestedByteCount));
 					ExFreePool(pTempBuffer);
 					pTempBuffer = NULL;
 					//
@@ -978,12 +978,12 @@ NTSTATUS - The return status for the operation
 					//{
 					//OffsetNew -= ENCRYPTIONHEADLENGTH;
 					//IrpContext->Union.NtfsIoContext->rst = FALSE;
-					KdPrint(("The process reading when the encrypt id is  Found ! readbytes is :%d \r\n", BytesToRead));
+					//KdPrint(("The process reading when the encrypt id is  Found ! readbytes is :%d \r\n", BytesToRead));
 					//}
 				}
 				
 				
-				//KdPrint( ("read   offset =%08x , count =%08x, %wZ \n",OffsetNew ,BytesToRead,&pFcb->pDiskFileObject->FullFilePath));
+				////KdPrint( ("read   offset =%08x , count =%08x, %wZ \n",OffsetNew ,BytesToRead,&pFcb->pDiskFileObject->FullFilePath));
 				
 
 				if (PfpNonCachedIoRead(	IrpContext,
@@ -1529,7 +1529,7 @@ PfpNonCachedSyncIoCompleteRead(
 				    //{
 						PfpDecryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_den_context);
 						//PfpEncryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_en_context);
-						KdPrint(("PfpNonCachedSyncIoCompleteRead--------------DecryptBuffter-------------\r\n"));
+						//KdPrint(("PfpNonCachedSyncIoCompleteRead--------------DecryptBuffter-------------\r\n"));
 					//}
 			}
 			if(Irp->MdlAddress!= pNtfsIoContext ->OriginatingIrp->MdlAddress )
@@ -1615,8 +1615,8 @@ PfpNonCachedAsyncIoCompleteRead(
 				//{
 				//DbgBreakPoint();
 					PfpDecryptBuffer(pBuffer, (ULONG)Irp->IoStatus.Information, &ase_den_context);
-					KdPrint(("PfpNonCachedAsyncIoCompleteRead--------------DecryptBuffter-------------\r\n"));
-					KdPrint(("Read File  Byte cout :%d \r\n", (ULONG)Irp->IoStatus.Information));
+					//KdPrint(("PfpNonCachedAsyncIoCompleteRead--------------DecryptBuffter-------------\r\n"));
+					//KdPrint(("Read File  Byte cout :%d \r\n", (ULONG)Irp->IoStatus.Information));
 				//}
 			}
 			

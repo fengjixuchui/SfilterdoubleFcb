@@ -543,7 +543,7 @@ PfpAddHanldeIntoProcessInfo(
 		pHandleInfo  = ExAllocatePoolWithTag(PagedPool,sizeof(HandleOfExe ),'0008');
 		if(pHandleInfo== NULL)
 		{
-			KdPrint (("Allocate Pool failed in Function PfpAddHanldeIntoProcessInfo \n"));
+			//KdPrint (("Allocate Pool failed in Function PfpAddHanldeIntoProcessInfo \n"));
 			return NULL;
 		}
 

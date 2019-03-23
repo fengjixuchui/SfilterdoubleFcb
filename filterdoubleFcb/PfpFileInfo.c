@@ -3275,14 +3275,14 @@ PfpSetFileInfo (
 
 	//			//从原来的目录下面 断下来，并且把原有的 virtualdiskfile 删除掉
 	//			pTempResource = ((PVIRTUALDISKFILE)(Fcb->pDiskFileObject->pVirtualDiskFile))->pVirtualDiskLocker;
-	//			KdPrint(("setinfomation function accquire file resource %Xh",pTempResource));
+	//			//KdPrint(("setinfomation function accquire file resource %Xh",pTempResource));
 	//			ExAcquireResourceExclusiveLite(pTempResource ,TRUE);
 	//			
 	//			PfpRemoveDiskFileObjectFromListEntry(Fcb->pDiskFileObject);					
 	//			PfpAddDiskFileObjectIntoItsVirtualDiskFile(pVirtualDiskFile,Fcb->pDiskFileObject);
 	//			
 	//			ExReleaseResourceLite(pTempResource);
-	//			KdPrint(("setinfomation function release file resource %Xh",pTempResource));
+	//			//KdPrint(("setinfomation function release file resource %Xh",pTempResource));
 	//			PfpDeleteVirtualDiskFile((PVIRTUALDISKFILE)(Fcb->pDiskFileObject->pVirtualDiskFile),NULL);
 	//			
 	//			

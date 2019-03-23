@@ -2838,7 +2838,7 @@ Return Value:
 					}
 					if( g_UsbDeviceSignal)
 					{
-						KdPrint(("set event in DetachfromFileSystem\r\n"));
+						//KdPrint(("set event in DetachfromFileSystem\r\n"));
 						KeSetEvent(g_UsbDeviceSignal ,IO_NO_INCREMENT, FALSE);
 					}
 				}

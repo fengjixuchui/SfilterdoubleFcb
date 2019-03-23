@@ -485,8 +485,8 @@ VOID AddProcessInfoIntoGlobal(PConfigData		pData)
 			{
 				break;
 			}
-			KdPrint(("[wrench]ADD process Name:%wZ\r\n", pProcInfo->ProcessName));
-			KdPrint(("[wrench]ADD process HashValue:%s\r\n", pProcInfo->ProcessHashValue));
+			//KdPrint(("[wrench]ADD process Name:%wZ\r\n", pProcInfo->ProcessName));
+			//KdPrint(("[wrench]ADD process HashValue:%s\r\n", pProcInfo->ProcessHashValue));
 		
 
 

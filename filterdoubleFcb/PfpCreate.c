@@ -194,7 +194,7 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 	}
    /* if(wcsstr(FullPathName,L"WINDOWS\\System32\\Msimtf.dll")!=NULL ||wcsstr(FullPathName,L"WINDOWS\\System32\\msimtf.dll")!=NULL )
     {
-        KdPrint (("\r\n"));
+        //KdPrint (("\r\n"));
     }*/
     bOpenFileStream = PfpIsStreamPath(FullPathName,lFullPathLenInBytes);
 
@@ -325,7 +325,7 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
   //  }
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
-    //KdPrint(((procdess id )));
+    ////KdPrint(((procdess id )));
     // 	if(	PfpFindExcludProcess(PsGetProcessId(IoGetCurrentProcess() )	))
     // 	{	//这个进程是被排除的进程，这里提前跳出
     // 		goto PASSTHROUGH;
@@ -456,7 +456,7 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 			ExAcquireResourceExclusiveLite(pVirtualDiskFile->pVirtualDiskLocker, TRUE);
 			pDeviceResouce = pParentRootDir->AccssLocker;
 			pVirtualFileResouce = pVirtualDiskFile->pVirtualDiskLocker;
-			//KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
+			////KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
 			pDiskFileObject = ((PPfpFCB)pFileObject->RelatedFileObject->FsContext)->pDiskFileObject;
 			DbgPrint("非授信进入xxx000\r\n");
 			goto FOLDERANDNOFOLDER;
@@ -504,7 +504,7 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 			ExAcquireResourceExclusiveLite(pVirtualDiskFile->pVirtualDiskLocker, TRUE);
 		    pDeviceResouce = pParentRootDir->AccssLocker;
 			pVirtualFileResouce = pVirtualDiskFile->pVirtualDiskLocker;
-			KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
+			//KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
 			pDiskFileObject = ((PPfpFCB)pFileObject->RelatedFileObject->FsContext)->pDiskFileObject;
 			goto FOLDERANDNOFOLDER;
 		}
@@ -525,11 +525,11 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 	      if(pVirtualDiskFile)
 	      {
 	          PDISKFILEOBJECT pDiskFile ;
-			  KdPrint(("[Wrench]pVirtualDiskFile延迟系统关闭\r\n"));
+			  //KdPrint(("[Wrench]pVirtualDiskFile延迟系统关闭\r\n"));
 	          pDiskFile = PpfGetDiskFileObjectFromVirtualDisk(pVirtualDiskFile );
 	          if(pDiskFile )
 	          {
-				  KdPrint(("[Wrench]pDiskFile延迟系统关闭\r\n"));
+				  //KdPrint(("[Wrench]pDiskFile延迟系统关闭\r\n"));
 	              PfpCloseFileHasGoThroughCleanupAndNotUsed(pDiskFile);//!!!!!!!!!!!!!!!这里好像没有存在的必要把难道是 exe文件 我们创建了并且要关闭？
 	          }
 	      }
@@ -592,7 +592,7 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 		  {
 			  pVirtualFileResouce = pVirtualDiskFile->pVirtualDiskLocker;
 			  ExAcquireResourceExclusiveLite(pVirtualFileResouce, TRUE);
-			  KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
+			  //KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
 		  }
 		  //////VirtualizerEnd();
 	  }
@@ -615,7 +615,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
 	 //              //FILE_OPEN_REPARSE_POINT 是处理应用程序自己定义的数据，加密驱动里面没必要多它的这个数据进行加密
      if(pstack->Parameters.Create.Options&FILE_OPEN_REPARSE_POINT)
 	 {
-		 //KdPrint(("[Wrench]应用程序自己定义的数据,pass\r\n"));
+		 ////KdPrint(("[Wrench]应用程序自己定义的数据,pass\r\n"));
 	     goto PASSTHROUGH;
 	 }
 
@@ -685,7 +685,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
         }
         pVirtualFileResouce		= pVirtualDiskFile->pVirtualDiskLocker;
         ExAcquireResourceExclusiveLite(pVirtualFileResouce,TRUE);
-        //KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
+        ////KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
 
         ASSERT(pDiskFileObject== NULL);
 
@@ -718,7 +718,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
     //如果 这个打开的文件已经在 delayclose的 队列里面 那么说明这个文件是存在在磁盘上的并且是没有被打开过的
     // 	if(pDiskFileObject== NULL && (pDiskFileObject = PfpFindDiskFileObjectFromDelayClose(DeviceLetter,&FileFullPath))!= NULL)
     // 	{					
-    // 		//KdPrint (("in create fileobject Opened From DelayClose queue %wZ\n",&pFileObject->FileName));
+    // 		////KdPrint (("in create fileobject Opened From DelayClose queue %wZ\n",&pFileObject->FileName));
     // 		bFirstOpen  = TRUE;	
     // 		pDiskFileObject ->bProcessOpened	= (ProcessInfo!= NULL);
     // 		pDiskFileObject ->bUnderSecurFolder = bFolderUnderProtect;
@@ -772,7 +772,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
     // 
     // 	if(wcschr(FullPathName,L':'))
     // 	{
-    // 		KdPrint((" \r\n"));
+    // 		//KdPrint((" \r\n"));
     // 	}
 
 	//这个原理是发送IRP进行判断文件是否存在的
@@ -816,7 +816,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
 
             if(!PfpIsFileEncryptedAccordtoFileSize(FilesizeForExistFile) && !bFileOurCreated)
             {
-                //KdPrint (("in create fileobject FileSize not correct for Encrypted File %wZ\n",&pFileObject->FileName));
+                ////KdPrint (("in create fileobject FileSize not correct for Encrypted File %wZ\n",&pFileObject->FileName));
                 goto PASSTHROUGH;
             }
             if(bFileExtInProcessNotSelected)
@@ -826,7 +826,7 @@ FOLDERANDNOFOLDER: //下面的就是个人安全文件夹和可信进程访问的时候都要做的
             }
             if(bFirstOpen &&!PfpIsFileEncrypted(&FileFullPath,DeviceObject) && !bFileOurCreated )
             {		
-				//KdPrint(("[Wrench] 第一次打开文件，并不是加密文件：：%wZ\n", &pFileObject->FileName));
+				////KdPrint(("[Wrench] 第一次打开文件，并不是加密文件：：%wZ\n", &pFileObject->FileName));
                 goto PASSTHROUGH;
             }
         }
@@ -1060,7 +1060,7 @@ Try_exit:
     } except(PfpExceptionFilter( IrpContext, GetExceptionInformation() ))
     {
 
-        KdPrint (("Voilation Happend in create fileobject %wZ\n",&pFileObject->FileName));
+        //KdPrint (("Voilation Happend in create fileobject %wZ\n",&pFileObject->FileName));
         //
         //  We had some trouble trying to perform the requested
         //  operation, so we'll abort the I/O request with
@@ -1100,7 +1100,7 @@ Try_exit:
 EXIT:
     if(pVirtualFileResouce)
     {
-        //KdPrint(("Create function release file resource %Xh\r\n",pVirtualFileResouce));
+        ////KdPrint(("Create function release file resource %Xh\r\n",pVirtualFileResouce));
         ExReleaseResource(pVirtualFileResouce);
     }
 
@@ -1158,7 +1158,7 @@ PASSTHROUGH:
     }
     if(pVirtualFileResouce)
     {
-        //KdPrint(("Create function release file resource %Xh\r\n",pVirtualFileResouce));
+        ////KdPrint(("Create function release file resource %Xh\r\n",pVirtualFileResouce));
         ExReleaseResource(pVirtualFileResouce);
     }
     if(pDeviceResouce)
@@ -1741,11 +1741,11 @@ try_exit: NOTHING;
         {
             if(AbnormalTermination())
             {
-                KdPrint(("OpenExsitingFcb function exception \r\n"));
+                //KdPrint(("OpenExsitingFcb function exception \r\n"));
             }
             else
             {
-                KdPrint(("OpenExsitingFcb function %Xh",Iosb.Status));
+                //KdPrint(("OpenExsitingFcb function %Xh",Iosb.Status));
             }
 
             if (UnwindShareAccess) { IoRemoveShareAccess( FileObject, &Fcb->ShareAccess ); }
@@ -2853,7 +2853,7 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
 
 				if (!NT_SUCCESS(ioStatus.Status))
 				{
-					KdPrint(("-------------------------------------PfpOpenExistingFcb failed error code :%Xh-------------------------------------\r\n", ioStatus.Status));
+					//KdPrint(("-------------------------------------PfpOpenExistingFcb failed error code :%Xh-------------------------------------\r\n", ioStatus.Status));
 				}
 			}
 			else
@@ -2913,7 +2913,7 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
 				}
 				else
 				{
-					KdPrint(("-------------------------------------PfpOpenExistingFile failed error code :%Xh-------------------------------------\r\n", ioStatus.Status));
+					//KdPrint(("-------------------------------------PfpOpenExistingFile failed error code :%Xh-------------------------------------\r\n", ioStatus.Status));
 				}
 			}
 		}
@@ -2938,7 +2938,7 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
 
                     if(!NT_SUCCESS(ioStatus.Status ))
                     {
-                        KdPrint(("-------------------------------------PfpOpenExistingFcb failed error code :%Xh-------------------------------------\r\n",ioStatus.Status));
+                        //KdPrint(("-------------------------------------PfpOpenExistingFcb failed error code :%Xh-------------------------------------\r\n",ioStatus.Status));
                     }
                 }
                 else
@@ -2987,7 +2987,7 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
                         }
                     }else
                     {
-                        KdPrint(("-------------------------------------PfpOpenExistingFile failed error code :%Xh-------------------------------------\r\n",ioStatus.Status));
+                        //KdPrint(("-------------------------------------PfpOpenExistingFile failed error code :%Xh-------------------------------------\r\n",ioStatus.Status));
                     }
                 }
             }
@@ -3020,7 +3020,7 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
 
                 }else
                 {
-                    KdPrint(("-------------------------------------PfpCreateNewFile failed error code :%Xh-------------------------------------\r\n",ioStatus.Status));
+                    //KdPrint(("-------------------------------------PfpCreateNewFile failed error code :%Xh-------------------------------------\r\n",ioStatus.Status));
                 }
             }
             break;
@@ -3030,7 +3030,7 @@ PfpEncapCreateFile(IN PIRP_CONTEXT				IrpContext,
     }except(EXCEPTION_EXECUTE_HANDLER)
     {
         ioStatus.Status  = STATUS_ACCESS_VIOLATION;
-        KdPrint(("-------------------------------------PfpEncapCreateFile exception-------------------------------------\r\n"));
+        //KdPrint(("-------------------------------------PfpEncapCreateFile exception-------------------------------------\r\n"));
     }
 
     ExReleaseResource(&(*pDiskFileObject)->UserObjectResource);
@@ -3100,7 +3100,7 @@ PPROCESSINFO PfpGetProcessInfoForCurProc()
         return NULL;
     }
 	memset(pszHashValue, 0, PROCESSHASHVALULENGTH);
-	RtlZeroMemory(imageName, PROCESSHASHVALULENGTH);
+	//RtlZeroMemory(imageName, PROCESSHASHVALULENGTH);
 
     hProcess = PsGetProcessId(IoGetCurrentProcess() );
     if(PfpFindExcludProcess(hProcess))	
@@ -3121,11 +3121,11 @@ PPROCESSINFO PfpGetProcessInfoForCurProc()
         //1:get Hash value : HashValue
         if(!NT_SUCCESS(GetProcessImageName(ZwCurrentProcess(),&ProcessName )))
         {
-            //KdPrint(("Failed to get Image Name\r\n"));
+            ////KdPrint(("Failed to get Image Name\r\n"));
             goto PASSTHROUGH;
         } 
 //////////////////////////////////////////////////////////////////////////////
-		//KdPrint(("Image Name::%wZ\r\n", &ProcessName));
+		////KdPrint(("Image Name::%wZ\r\n", &ProcessName));
 		//这个估计都不需要比较，上锁把=-=
 
 		status = RtlStringCbCopyNW(imageName, 512, ProcessName.Buffer, ProcessName.Length);
@@ -3134,16 +3134,16 @@ PPROCESSINFO PfpGetProcessInfoForCurProc()
 		    ExFreePool(imageName);
 		     goto PASSTHROUGH;
 	     }
-		 //KdPrint(("进程名:%ws\r\n", imageName));
+		 ////KdPrint(("进程名:%ws\r\n", imageName));
 		if (wcswcs(imageName, tmp) != NULL)
 		{
 			ExFreePool(imageName);
-			KdPrint(("发现授信进程\r\n"));
+			//KdPrint(("发现授信进程\r\n"));
 			//DbgBreakPoint();
 		}
 		else {
 			ExFreePool(imageName);
-			//KdPrint((" -----------------findn't notepad.exe\r\n"));
+			////KdPrint((" -----------------findn't notepad.exe\r\n"));
 			goto PASSTHROUGH;
 		}
 //////////////////////////////////////////////////////////////////////////////
@@ -3176,7 +3176,7 @@ PPROCESSINFO PfpGetProcessInfoForCurProc()
             PfpAddExcludProcess(hProcess);
             goto PASSTHROUGH ;
         }
-		//KdPrint(("get notepad.exe\r\n"));//光判断进程名是oj8k的
+		////KdPrint(("get notepad.exe\r\n"));//光判断进程名是oj8k的
         ExAcquireFastMutex(&ProcessInfo->HandleMutex);
         PfpAddHanldeIntoProcessInfo(hProcess,ProcessInfo);
         ExReleaseFastMutex(&ProcessInfo->HandleMutex);	
@@ -3702,7 +3702,7 @@ NTSTATUS PfpOpenFileByShadowDevice(
         FILE_ATTRIBUTE_NORMAL ,
         FILE_SHARE_READ|FILE_SHARE_WRITE,
         FILE_OPEN,
-        FILE_NON_DIRECTORY_FILE|FILE_NO_INTERMEDIATE_BUFFERING|FILE_SYNCHRONOUS_IO_NONALERT|FILE_COMPLETE_IF_OPLOCKED,
+        FILE_NON_DIRECTORY_FILE|FILE_NO_INTERMEDIATE_BUFFERING|FILE_SYNCHRONOUS_IO_NONALERT|FILE_COMPLETE_IF_OPLOCKED, //FILE_COMPLETE_IF_OPLOCKED 
         NULL,
         0);
 

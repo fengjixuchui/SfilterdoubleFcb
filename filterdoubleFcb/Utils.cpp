@@ -827,9 +827,9 @@ NTSTATUS CallLowerDriver(IN PIRP_CONTEXT IrpContext)
 	Status = IoCallDriver(RealFsDevice, Irp);
 	if (Status == STATUS_PENDING)
 	{
-		//     KdPrint(("STATUS_PENDING Begin\n"));
+		//     //KdPrint(("STATUS_PENDING Begin\n"));
 		KeWaitForSingleObject(&Event, Executive, KernelMode, FALSE, NULL);
-		//     KdPrint(("STATUS_PENDING End\n"));
+		//     //KdPrint(("STATUS_PENDING End\n"));
 		Status = RealFileObject->FinalStatus;
 	}
 	return Status;
