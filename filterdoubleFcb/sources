@@ -9,6 +9,7 @@ INCLUDES=$(INCLUDES);include
 
 TARGETLIBS=$(TARGETLIBS)\
            $(DDK_LIB_PATH)\ntstrsafe.lib \
+		   $(DDK_LIB_PATH)\NtosKrnl.lib \
 		   $(DDK_LIB_PATH)\libcntpr.lib	\
            $(DDK_LIB_PATH)\wdmsec.lib\
 		   $(LIBPATH)\*\htscpp.lib\

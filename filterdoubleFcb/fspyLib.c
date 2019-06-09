@@ -2304,7 +2304,9 @@ Return Value:
         if (stackDeviceObject->DeviceType == FILE_DEVICE_NETWORK_FILE_SYSTEM) {
 
             SpyStoreUserName( devExt, userDeviceName );
+
         }
+
 
         //
         //  Clear the reference that was returned from SpyIsAttachedToDevice.

@@ -1,0 +1,5 @@
+1>errors in directory c:\users\wrench\desktop\sfilte~1\filter~1
+1>c:\winddk\7600.16385.1\inc\api\windef.h(57) : error C2220: warning treated as error - no 'object' file generated
+1>c:\winddk\7600.16385.1\inc\api\windef.h(57) : error C2220: warning treated as error - no 'object' file generated
+1>c:\users\wrench\desktop\sfilterdoublefcb\filterdoublefcb\pfpclose.c(51) : error C2220: warning treated as error - no 'object' file generated
+1>link : error LNK1181: cannot open input file 'c:\users\wrench\desktop\sfilte~1\filter~1\objfre_wxp_x86\i386\filespy.obj'

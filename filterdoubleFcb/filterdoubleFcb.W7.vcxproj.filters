@@ -38,6 +38,12 @@
     <Filter Include="Config">
       <UniqueIdentifier>{529650e7-5c98-48ee-8906-0717de3150d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="KernelSocket">
+      <UniqueIdentifier>{ae3229dd-41db-44cd-b59f-5367641009cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mup manage">
+      <UniqueIdentifier>{fdad5881-d4bf-4142-8ea6-e2ade82e02d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Aescrypt.c">
@@ -244,6 +250,9 @@
     <ClCompile Include="strtod.c">
       <Filter>Include\JSON</Filter>
     </ClCompile>
+    <ClCompile Include="mup.c">
+      <Filter>mup manage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aes.h">
@@ -395,6 +404,9 @@
     </ClInclude>
     <ClInclude Include="Include\strtod.h">
       <Filter>Include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="mup.h">
+      <Filter>mup manage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

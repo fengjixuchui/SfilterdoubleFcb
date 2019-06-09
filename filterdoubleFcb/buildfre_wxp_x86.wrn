@@ -1,0 +1,12 @@
+1>warnings in directory c:\users\wrench\desktop\sfilte~1\filter~1
+1>c:\winddk\7600.16385.1\inc\api\windef.h(57) : warning C4005: 'MAX_PATH' : macro redefinition
+1>c:\winddk\7600.16385.1\inc\api\windef.h(123) : warning C4005: 'CALLBACK' : macro redefinition
+1>c:\winddk\7600.16385.1\inc\api\windef.h(184) : warning C4142: benign redefinition of type
+1>c:\winddk\7600.16385.1\inc\api\windef.h(185) : warning C4142: benign redefinition of type
+1>c:\winddk\7600.16385.1\inc\api\windef.h(57) : warning C4005: 'MAX_PATH' : macro redefinition
+1>c:\winddk\7600.16385.1\inc\api\windef.h(123) : warning C4005: 'CALLBACK' : macro redefinition
+1>c:\winddk\7600.16385.1\inc\api\windef.h(184) : warning C4142: benign redefinition of type
+1>c:\winddk\7600.16385.1\inc\api\windef.h(185) : warning C4142: benign redefinition of type
+1>c:\users\wrench\desktop\sfilterdoublefcb\filterdoublefcb\pfpcreate.c(17) : warning C4047: 'initializing' : 'ULONG' differs in levels of indirection from 'void *'
+1>c:\users\wrench\desktop\sfilterdoublefcb\filterdoublefcb\pfpcreate.c(189) : warning C4047: '==' : 'ULONG' differs in levels of indirection from 'void *'
+1>c:\users\wrench\desktop\sfilterdoublefcb\filterdoublefcb\pfpclose.c(51) : warning C4047: '==' : 'ULONG' differs in levels of indirection from 'HANDLE'
