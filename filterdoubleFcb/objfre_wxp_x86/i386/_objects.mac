@@ -1,0 +1,85 @@
+
+
+386_OBJECTS=\
+ $(OBJ_PATH)\$O\filespy.obj \
+ $(OBJ_PATH)\$O\fspylib.obj \
+ $(OBJ_PATH)\$O\fspyctx.obj \
+ $(OBJ_PATH)\$O\fspyhash.obj \
+ $(OBJ_PATH)\$O\fspytx.obj \
+ $(OBJ_PATH)\$O\pfpfile.obj \
+ $(OBJ_PATH)\$O\pfpread.obj \
+ $(OBJ_PATH)\$O\pfpwrite.obj \
+ $(OBJ_PATH)\$O\fastlock.obj \
+ $(OBJ_PATH)\$O\fstiosup.obj \
+ $(OBJ_PATH)\$O\fastquery.obj \
+ $(OBJ_PATH)\$O\pfpcreate.obj \
+ $(OBJ_PATH)\$O\resrcsup.obj \
+ $(OBJ_PATH)\$O\pfpcleanup.obj \
+ $(OBJ_PATH)\$O\strucsup.obj \
+ $(OBJ_PATH)\$O\pfpclose.obj \
+ $(OBJ_PATH)\$O\pfpfileinfo.obj \
+ $(OBJ_PATH)\$O\pfpworkque.obj \
+ $(OBJ_PATH)\$O\pfpdata.obj \
+ $(OBJ_PATH)\$O\pfpdeviosup.obj \
+ $(OBJ_PATH)\$O\pfpdisp.obj \
+ $(OBJ_PATH)\$O\namelookup.obj \
+ $(OBJ_PATH)\$O\pfpcache.obj \
+ $(OBJ_PATH)\$O\ea.obj \
+ $(OBJ_PATH)\$O\pfpflush.obj \
+ $(OBJ_PATH)\$O\pfphide.obj \
+ $(OBJ_PATH)\$O\procnotify.obj \
+ $(OBJ_PATH)\$O\pfpconfigsetting.obj \
+ $(OBJ_PATH)\$O\pfpprocessinfo.obj \
+ $(OBJ_PATH)\$O\pfpbackupthread.obj \
+ $(OBJ_PATH)\$O\aeskey.obj \
+ $(OBJ_PATH)\$O\aestab.obj \
+ $(OBJ_PATH)\$O\blowfish.obj \
+ $(OBJ_PATH)\$O\cast.obj \
+ $(OBJ_PATH)\$O\des.obj \
+ $(OBJ_PATH)\$O\rmd160.obj \
+ $(OBJ_PATH)\$O\serpent.obj \
+ $(OBJ_PATH)\$O\sha1.obj \
+ $(OBJ_PATH)\$O\sha2.obj \
+ $(OBJ_PATH)\$O\twofish.obj \
+ $(OBJ_PATH)\$O\whirlpool.obj \
+ $(OBJ_PATH)\$O\endian.obj \
+ $(OBJ_PATH)\$O\aescrypt.obj \
+ $(OBJ_PATH)\$O\pfpfolderprotect.obj \
+ $(OBJ_PATH)\$O\md5.obj \
+ $(OBJ_PATH)\$O\log.obj \
+ $(OBJ_PATH)\$O\delayclose.obj \
+ $(OBJ_PATH)\$O\pfpusbdevice.obj \
+ $(OBJ_PATH)\$O\pfpvirtualdir.obj \
+ $(OBJ_PATH)\$O\pfpusbsecure.obj \
+ $(OBJ_PATH)\$O\deviceiocontrol.obj \
+ $(OBJ_PATH)\$O\verifykey.obj \
+ $(OBJ_PATH)\$O\pfpprocessexclude.obj \
+ $(OBJ_PATH)\$O\fake_function.obj \
+ $(OBJ_PATH)\$O\regfilter.obj \
+ $(OBJ_PATH)\$O\ntmem.obj \
+ $(OBJ_PATH)\$O\base64.obj \
+ $(OBJ_PATH)\$O\strtod.obj \
+ $(OBJ_PATH)\$O\cjson.obj \
+ $(OBJ_PATH)\$O\cjson_utils.obj \
+ $(OBJ_PATH)\$O\data.obj \
+ $(OBJ_PATH)\$O\utils.obj \
+ $(OBJ_PATH)\$O\hex.obj \
+ $(OBJ_PATH)\$O\fileutils.obj \
+ $(OBJ_PATH)\$O\cryptutils.obj \
+ $(OBJ_PATH)\$O\common.obj \
+ $(OBJ_PATH)\$O\cryptbox.obj \
+ $(OBJ_PATH)\$O\rc4.obj \
+ $(OBJ_PATH)\$O\crc32.obj \
+
+
+_RES_FILE=$(OBJ_PATH)\$O\filespy.res
+
+
+
+# lowercased
+BASEDIR=c:\winddk\760016~1.1
+OBJECT_ROOT=c:\winddk\760016~1.1
+MAKEDIR_LOWERCASE=c:\users\wrench\desktop\sfilte~1\filter~1
+OBJ_PATH=c:\users\wrench\desktop\sfilte~1\filter~1
+CONCURRENT_MIDL=0
+CONCURRENT_MANIFEST_BUILD=0

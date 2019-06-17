@@ -237,7 +237,7 @@ PfpCommonCleanup (                        //  implemented in Cleanup.c
 // 		(!FlagOn( pFileObject->Flags, FO_NO_INTERMEDIATE_BUFFERING ) &&
 // 		(pFcb->NonCachedUnCleanupCount != 0) &&
 // 		(pFcb->UncleanCount == (pFcb->NonCachedUnCleanupCount + 1)) ||
-		/*(pFcb->UncleanCount==1)*/(nCleanupCount=PfpGetUncleanupCount(pDiskFileObj))==1&&
+		/*(pFcb->UncleanCount==1)*/(/*nCleanupCount=PfpGetUncleanupCount(pDiskFileObj))==1&&*/
 		(pFcb->SegmentObject.DataSectionObject != NULL) &&
 		(pFcb->SegmentObject.ImageSectionObject == NULL)  &&
 		MmCanFileBeTruncated( &pFcb->SegmentObject, NULL )) 

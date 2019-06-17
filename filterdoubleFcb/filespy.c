@@ -51,6 +51,7 @@ Environment:
 #include "PfpCreate.h"
 #include <ntstrsafe.h>
 #include "Data_Extern_C.h"
+#include "mup.h"
 //
 //  list of known device types
 //
@@ -123,7 +124,7 @@ const PCHAR DeviceTypeNames[] = {
 
 ULONG SizeOfDeviceTypeNames = sizeof( DeviceTypeNames );
 
-
+#define FSP_FSCTL_MUP_DEVICE_NAME L"my_mup"
 
 
 //
@@ -259,65 +260,10 @@ Return Value:
 	NtfsLarge1.HighPart=1;
 	NtfsLarge1.LowPart =0;
 	gFileSpyAttachMode = FILESPY_ATTACH_ON_DEMAND;
+	PDEVICE_OBJECT FspFsmupDeviceObject;
+	UNICODE_STRING DeviceName;
+	HANDLE FspMupHandle;
 	g_ShadowDeivceName = ExAllocatePoolWithTag(PagedPool,(wcslen(L"\\Device\\ShadowDevicePfp0000")+1)*sizeof(WCHAR),'pfp0');
-	//ProcName = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR), 'pfp6');
-	//if (ProcName == NULL)
-	//{
-	//	return STATUS_INSUFFICIENT_RESOURCES;
-	//}
-	//RtlZeroMemory(ProcName, (wcslen(L"NOTEPAD.EXE") + 1) * sizeof(WCHAR));
-	//wcscpy(ProcName, L"NOTEPAD.EXE");
-
-	////DbgBreakPoint();
-
-
-
-
-	//DOCX = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"docx") + 1) * sizeof(WCHAR), 'pfp0');
-	//if (DOCX == NULL)
-	//{
-	//	return STATUS_INSUFFICIENT_RESOURCES;
-	//}
-	//RtlZeroMemory(DOCX, (wcslen(L"docx") + 1) * sizeof(WCHAR));
-	//wcscpy(DOCX, L"docx");
-
-
-	//DOC = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"doc") + 1) * sizeof(WCHAR), 'pfp0');
-	//if (DOC == NULL)
-	//{
-	//	return STATUS_INSUFFICIENT_RESOURCES;
-	//}
-	//RtlZeroMemory(DOC, (wcslen(L"doc") + 1) * sizeof(WCHAR));
-	//wcscpy(DOC, L"doc");
-
-
-	//tmp = ExAllocatePoolWithTag(NonPagedPool, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR), 'pfp6');
-	//if (tmp == NULL)
-	//{
-	//	return STATUS_INSUFFICIENT_RESOURCES;
-	//}
-	//RtlZeroMemory(tmp, (wcslen(L"WPS.EXE") + 1) * sizeof(WCHAR));
-	//wcscpy(tmp, L"WPS.EXE");
-	//上面有一部分废代码
-
-	//InitData(DriverObject);
-	//status = InitSystemRootPath();
-	//if (!NT_SUCCESS(status))
-	//{
-	//	//DebugTrace(DEBUG_TRACE_ERROR, ("FileSafe!DriverEntry -> InitSystemRootPath Fail! Status = 0x%08x\n", status));
-	//	status = STATUS_UNSUCCESSFUL;
-	//	return status;
-	//}
-
-
-
-
-
-
-
-
-	//InitializeWChar(tmp, "TMP");
-
 	if(g_ShadowDeivceName== NULL)
 	{
 		return STATUS_INSUFFICIENT_RESOURCES;
@@ -571,10 +517,9 @@ Return Value:
 
 	gControlDeviceState = CLOSED;
 
-	////VirtualizerStart();
+
     RtlInitUnicodeString( &linkString, FILESPY_DOSDEVICE_NAME );
     status = IoCreateSymbolicLink( &linkString, &nameString );
-	////VirtualizerEnd();
 
     if (!NT_SUCCESS(status))
 	{
@@ -583,10 +528,9 @@ Return Value:
         //  Remove the existing symbol link and try and create it again.
         //  If this fails then quit.
         //
-		//////VirtualizerStart();
+
         IoDeleteSymbolicLink( &linkString );
         status = IoCreateSymbolicLink( &linkString, &nameString );
-		//////VirtualizerEnd();
         if (!NT_SUCCESS(status))
 		{
             IoDeleteDevice(gControlDeviceObject);
@@ -620,8 +564,8 @@ Return Value:
 	DriverObject->MajorFunction[IRP_MJ_DIRECTORY_CONTROL]			= FsDirectoryControl;
 	DriverObject->MajorFunction[IRP_MJ_QUERY_SECURITY]				= PfpFsQueryAndSetSec;
 	DriverObject->MajorFunction[IRP_MJ_SET_SECURITY]				= PfpFsQueryAndSetSec;
-	//这是我自己加的
-	//-DriverObject->MajorFunction[IRP_MJ_ACQUIRE_FOR_SECTION_SYNCHRONIZATION] = PfpFsQueryAndSetSec;
+	
+
 
 	 
     //
@@ -811,52 +755,21 @@ Return Value:
 	////VirtualizerStart();
     ClearFlag( gControlDeviceObject->Flags, DO_DEVICE_INITIALIZING );
 	//////////////////////////////////////////////////////////////////////////
-
 	CacheManagerCallbacks.AcquireForLazyWrite  = &PfpAcquireFCBForLazyWrite;
 	CacheManagerCallbacks.ReleaseFromLazyWrite = &PfpReleaseFCBFromLazyWrite;
 	CacheManagerCallbacks.AcquireForReadAhead  = &PfpAcquireFCBForReadAhead;
 	CacheManagerCallbacks.ReleaseFromReadAhead = &PfpReleaseFCBFromReadAhead;
-	////VirtualizerEnd();
 	//////////////////////////////////////////////////////////////////////////
 
-	//szBuf = (PWCHAR )ExAllocatePool_A(NonPagedPool,100);
-	//memset(szBuf,0, 100);
-	////wcscpy(szBuf,L"BitSecPLUG.dll");
-	//RtlInitUnicodeString(&g_p1,szBuf);
-	//szBuf = (PWCHAR )ExAllocatePool_A(NonPagedPool,100);
-	//memset(szBuf,0, 100);
-	//wcscpy(szBuf,L"CreateSelfExtractor.exe");
-	//RtlInitUnicodeString(&g_p2,szBuf);
-	//szBuf = (PWCHAR )ExAllocatePool_A(NonPagedPool,100);
-	//memset(szBuf,0, 100);
-	//wcscpy(szBuf,L"PfpDrv.sys");
-	//RtlInitUnicodeString(&g_p3,szBuf);
-	//szBuf = (PWCHAR )ExAllocatePool_A(NonPagedPool,100);
-	//memset(szBuf,0, 100);
-	//wcscpy(szBuf,L"SecurityGUI.exe");
-	//RtlInitUnicodeString(&g_p4,szBuf);
-	//szBuf = (PWCHAR )ExAllocatePool_A(NonPagedPool,100);
-	//memset(szBuf,0, 100);
-	//wcscpy(szBuf,L"ProcessFilter.CFG");
-	//RtlInitUnicodeString(&g_p5,szBuf);
-	//szBuf = (PWCHAR )ExAllocatePool_A(NonPagedPool,100);
-	//memset(szBuf,0, 100);
-	//wcscpy(szBuf,L"Keyfile.CFG");
-	//RtlInitUnicodeString(&g_p6,szBuf);
+
 	
 
 	// i don't care if this call sucess.
-	
-	
 	g_szBackupDir  = NULL;
 	
 	//memcpy(szPrivateKey,L"个人文档加密系统",16);
 
 	aes_init();
-
-
-	
-
 	g_pKeyFileContent = NULL;
 	g_keyFileLen	  = 0;
 
@@ -872,19 +785,36 @@ Return Value:
 
 	g_bProtectSySself	= TRUE;
 	g_bEncrypteUDISK	= FALSE;
-	//驱动起来的时候，就针对所有的硬盘的分区全部挂接
-	
+
 	g_DriverDir =  NULL;
 	g_ConfigFile = INVALID_HANDLE_VALUE;
-	
-	g_RegistryPath.Buffer   =ExAllocatePool_A(NonPagedPool,RegistryPath->MaximumLength);
-	if(g_RegistryPath.Buffer   )
+
+	//注册mup,网络重定向
+	status = FspDeviceCreate(FspFsmupDeviceExtensionKind, 0,
+		FILE_DEVICE_NETWORK_FILE_SYSTEM, FILE_REMOTE_DEVICE,
+		&FspFsmupDeviceObject);
+	if (!NT_SUCCESS(status))
+		return status;
+
+
+	RtlInitUnicodeString(&DeviceName, L"\\Device\\" FSP_FSCTL_MUP_DEVICE_NAME);
+	status = FsRtlRegisterUncProviderEx(&FspMupHandle,
+		&DeviceName, FspFsmupDeviceObject ,0);
+	if (!NT_SUCCESS(status))
+		return status;
+
+
+
+
+
+	g_RegistryPath.Buffer=ExAllocatePool_A(NonPagedPool,RegistryPath->MaximumLength);
+	if(g_RegistryPath.Buffer)
 	{
 		g_RegistryPath.Length= RegistryPath->Length;
 		g_RegistryPath.MaximumLength= RegistryPath->MaximumLength;
 		memcpy(g_RegistryPath.Buffer,RegistryPath->Buffer,RegistryPath->MaximumLength);
+		//驱动起来的时候，就针对所有的硬盘的分区全部挂接
 		IoRegisterDriverReinitialization(DriverObject,PfpInitDriverAtStartUp,&g_RegistryPath);
-		//IoRegisterBootDriverReinitialization(DriverObject,PfpInitDriverAtStartUp,&g_RegistryPath);
 	}
 	
 	

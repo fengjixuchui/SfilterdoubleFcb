@@ -309,6 +309,7 @@
     <ClCompile Include="Hex.cpp" />
     <ClCompile Include="Log.c" />
     <ClCompile Include="md5.c" />
+    <ClCompile Include="mup.c" />
     <ClCompile Include="namelookup.c" />
     <ClCompile Include="NtMem.c" />
     <ClCompile Include="PfpBackUpThread.c" />
@@ -383,6 +384,7 @@
     <ClInclude Include="LOG.h" />
     <ClInclude Include="MD5.h" />
     <ClInclude Include="Md5g.h" />
+    <ClInclude Include="mup.h" />
     <ClInclude Include="namelookupdef.h" />
     <ClInclude Include="NtMem.h" />
     <ClInclude Include="PfpCreate.h" />

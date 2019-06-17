@@ -168,7 +168,8 @@ PfpFsdClose (                          //  implemented in Close.c
 			{
 				//KdPrint(("there is a file dettached from VirtualDiskFile Object and handled by layzewriter %wZ\r\n",&pDiskFileObj->FileNameOnDisk));
 				PfpDeleteDiskFileObject(&pDiskFileObj);
-			}else
+			}
+			else
 			{
 				PfpDeleteVirtualDiskFile(pDiskFileObj->pVirtualDiskFile,pDiskFileObj);
 			}			
