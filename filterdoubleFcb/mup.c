@@ -22,6 +22,8 @@
 //#include <sys/driver.h>
 
 #include "mup.h"
+#include "fspyKern.h"
+#include <wdmsec.h>
 /*
  * FSP_MUP_PREFIX_CLASS
  *
@@ -113,6 +115,77 @@ typedef struct _FSP_MUP_CLASS
     UNICODE_PREFIX_TABLE_ENTRY Entry;
     WCHAR Buffer[];
 } FSP_MUP_CLASS;
+
+
+BOOLEAN
+IsFspFileObjectHasOurFCB(
+	IN PFILE_OBJECT pFileObject
+)
+{
+
+	BOOLEAN b = FALSE;
+
+	b = (pFileObject && (pFileObject->FsContext) && ((PPfpFCB)pFileObject->FsContext)->Header.NodeTypeCode == -32768);
+
+	return b;
+
+}
+
+NTSTATUS FspDeviceCreateSecure(UINT32 Kind, ULONG ExtraSize,
+	PUNICODE_STRING DeviceName, DEVICE_TYPE DeviceType, ULONG DeviceCharacteristics,
+	PUNICODE_STRING DeviceSddl, LPCGUID DeviceClassGuid,
+	PDEVICE_OBJECT* PDeviceObject)
+{
+	PAGED_CODE();
+
+	NTSTATUS Result;
+	ULONG DeviceExtensionSize;
+	PDEVICE_OBJECT DeviceObject;
+	FSP_DEVICE_EXTENSION* DeviceExtension;
+
+	*PDeviceObject = 0;
+
+	switch (Kind)
+	{
+	case FspFsvolDeviceExtensionKind:
+		DeviceExtensionSize = sizeof(FSP_FSVOL_DEVICE_EXTENSION);
+		break;
+	case FspFsmupDeviceExtensionKind:
+		DeviceExtensionSize = sizeof(FSP_FSMUP_DEVICE_EXTENSION);
+		break;
+	case FspFsvrtDeviceExtensionKind:
+	case FspFsctlDeviceExtensionKind:
+		DeviceExtensionSize = sizeof(FSP_DEVICE_EXTENSION);
+		break;
+	default:
+		ASSERT(0);
+		return STATUS_INVALID_PARAMETER;
+	}
+
+	if (0 != DeviceSddl)
+		Result = IoCreateDeviceSecure(FspDriverObject,
+			DeviceExtensionSize + ExtraSize, DeviceName, DeviceType,
+			DeviceCharacteristics, FALSE,
+			DeviceSddl, DeviceClassGuid,
+			&DeviceObject);
+	else
+		Result = IoCreateDevice(FspDriverObject,
+			DeviceExtensionSize + ExtraSize, DeviceName, DeviceType,
+			DeviceCharacteristics, FALSE,
+			&DeviceObject);
+	if (!NT_SUCCESS(Result))
+		return Result;
+
+	DeviceExtension = FspDeviceExtension(DeviceObject);
+	KeInitializeSpinLock(&DeviceExtension->SpinLock);
+	DeviceExtension->RefCount = 1;
+	DeviceExtension->Kind = Kind;
+
+	*PDeviceObject = DeviceObject;
+
+	return Result;
+}
+
 
 static NTSTATUS FspMupGetClassName(
     PUNICODE_STRING VolumePrefix, PUNICODE_STRING ClassName)
@@ -392,7 +465,7 @@ NTSTATUS FspMupHandleIrp(
          * CLEANUP and CLOSE requests for it.
          */
 
-        if (0 != FileObject)
+        /*if (0 != FileObject)
         {
             if (FspFileNodeIsValid(FileObject->FsContext))
                 FsvolDeviceObject = ((FSP_FILE_NODE *)FileObject->FsContext)->FsvolDeviceObject;
@@ -401,7 +474,20 @@ NTSTATUS FspMupHandleIrp(
                 0 != ((PDEVICE_OBJECT)FileObject->FsContext2)->DeviceExtension &&
                 FspFsvolDeviceExtensionKind == FspDeviceExtension((PDEVICE_OBJECT)FileObject->FsContext2)->Kind)
                 FsvolDeviceObject = (PDEVICE_OBJECT)FileObject->FsContext2;
-        }
+        }*/
+		if (0 != FileObject)
+		{
+			if (IsFspFileObjectHasOurFCB(FileObject))
+			{
+				FsvolDeviceObject = ((PPfpFCB*)FileObject->FsContext)->FsvolDeviceObject;
+			}else if (0 != FileObject->FsContext2 &&
+				3 == ((PDEVICE_OBJECT)FileObject->FsContext2)->Type &&
+				0 != ((PDEVICE_OBJECT)FileObject->FsContext2)->DeviceExtension &&
+				FspFsvolDeviceExtensionKind == FspDeviceExtension((PDEVICE_OBJECT)FileObject->FsContext2)->Kind)
+				FsvolDeviceObject = (PDEVICE_OBJECT)FileObject->FsContext2;
+		}
+
+
 		//这里判断是否是我们的Fake_fcb
 
         break;

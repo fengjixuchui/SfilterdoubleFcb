@@ -2,6 +2,8 @@
 #include <ntifs.h>
 #include <ntddk.h>
 
+extern PDRIVER_OBJECT FspDriverObject;
+
 typedef struct
 {
 	KTIMER Timer;
@@ -111,4 +113,10 @@ FSP_FSMUP_DEVICE_EXTENSION* FspFsmupDeviceExtension(PDEVICE_OBJECT DeviceObject)
 
 NTSTATUS FspDeviceCreate(UINT32 Kind, ULONG ExtraSize,
 	DEVICE_TYPE DeviceType, ULONG DeviceCharacteristics,
+	PDEVICE_OBJECT* PDeviceObject);
+
+
+NTSTATUS FspDeviceCreateSecure(UINT32 Kind, ULONG ExtraSize,
+	PUNICODE_STRING DeviceName, DEVICE_TYPE DeviceType, ULONG DeviceCharacteristics,
+	PUNICODE_STRING DeviceSddl, LPCGUID DeviceClassGuid,
 	PDEVICE_OBJECT* PDeviceObject);

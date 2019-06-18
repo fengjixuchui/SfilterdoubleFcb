@@ -401,21 +401,21 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 			//对于 不可信的进程。
 			if (PfpIsRequestWriteAccess(Irp) && !bFirstOpen)//这个非可信的进程要写的权限，并且这个时候文件已经被可信的进程正在编辑？
 			{
-				DbgPrint("[Wrench]不可信进程的读取\r\n");
+				//DbgPrint("[Wrench]不可信进程的读取\r\n");
 				if (pDiskFileObject->pFCB)
 				{
 
 					if (((PPfpFCB)pDiskFileObject->pFCB)->UncleanCount == 0)
 					{
 						ExAcquireFastMutex(((PPfpFCB)pDiskFileObject->pFCB)->Other_Mutex);
-						DbgPrint("pFCBUncleanCount==0\r\n");
+						//DbgPrint("pFCBUncleanCount==0\r\n");
 						((PPfpFCB)pDiskFileObject->pFCB)->bModifiedByOther = FALSE;
 						ExReleaseFastMutex(((PPfpFCB)pDiskFileObject->pFCB)->Other_Mutex);
 
 					}
 					else
 					{//说明 这个时候密文正在被编辑中，对于非可信的进程返回 拒绝访问。
-						DbgPrint("拒绝访问\r\n");
+						//DbgPrint("拒绝访问\r\n");
 						iostatus.Status = STATUS_ACCESS_DENIED;
 						iostatus.Information = 0;
 						goto EXIT;
@@ -425,12 +425,12 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 			}
 			goto PASSTHROUGH;
 		}
-		DbgPrint("[Wrench]PfpCreate::This is my Fcb!\r\n");
+		//DbgPrint("[Wrench]PfpCreate::This is my Fcb!\r\n");
 		goto EXIT;
 	}
 	else if (PfpFileObjectHasOurFCB(pFileObject->RelatedFileObject))
 	{
-		DbgPrint("其他文件对象是我们创建FCB\r\n");
+		//DbgPrint("其他文件对象是我们创建FCB\r\n");
 		if (bOpenFileStream)
 		{
 			pFileObject->RelatedFileObject = NULL;
@@ -444,7 +444,7 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 
 			memcpy(pFileObject->FileName.Buffer, FullPathName, lFullPathLenInBytes);
 			pFileObject->FileName.Buffer[lFullPathLenInBytes >> 1] = L'\0';
-			DbgPrint("打开流文件\r\n");
+			//DbgPrint("打开流文件\r\n");
 			goto PASSTHROUGH;
 		}
 		else
@@ -458,7 +458,7 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 			pVirtualFileResouce = pVirtualDiskFile->pVirtualDiskLocker;
 			////KdPrint(("Create function accquire file resource %Xh\r\n",pVirtualFileResouce));
 			pDiskFileObject = ((PPfpFCB)pFileObject->RelatedFileObject->FsContext)->pDiskFileObject;
-			DbgPrint("非授信进入xxx000\r\n");
+			//DbgPrint("非授信进入xxx000\r\n");
 			goto FOLDERANDNOFOLDER;
 		}
 		//iostatus.Status = STATUS_ACCESS_DENIED;
@@ -492,7 +492,7 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 			pFileObject->FileName.MaximumLength = ((USHORT)lFullPathLenInBytes + 2);
 			memcpy(pFileObject->FileName.Buffer, FullPathName, lFullPathLenInBytes);
 			pFileObject->FileName.Buffer[lFullPathLenInBytes >> 1] = L'\0';
-			DbgPrint("打开流文件\r\n");
+			//DbgPrint("打开流文件\r\n");
 			goto PASSTHROUGH;
 		}
 		else
@@ -549,7 +549,7 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 	              {
 	                  iostatus.Status			= STATUS_ACCESS_DENIED;
 	                  iostatus.Information	= 0;
-				DbgPrint("[Wrench]394 EXIT\r\n");
+				//DbgPrint("[Wrench]394 EXIT\r\n");
 	                  goto EXIT;
 	              }				
 		}
@@ -559,7 +559,7 @@ PfpCommonCreate(__in PIRP_CONTEXT	IrpContextParam	,
 			pDiskFileObject->bFileNOTEncypted = TRUE;*/
 		}
 	      }
-	      DbgPrint("[Wrench]437 EXIT\r\n");
+	      //DbgPrint("[Wrench]437 EXIT\r\n");
 	      goto PASSTHROUGH;
 	  }
 
