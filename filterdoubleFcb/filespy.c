@@ -470,13 +470,19 @@ Return Value:
     //  check for this condition to determine if the fast IO is directed at the
     //  control device.
     //
-	status =  IoCreateDeviceSecure(DriverObject,
-		0,
-		&nameString,
-		FILE_DEVICE_DISK_FILE_SYSTEM,
-		0,
-		FALSE,
-		&ustrSecDDL,NULL,&gControlDeviceObject);
+
+	/*------------------------------------------------------------*/
+	//这里先不用
+	//status =  IoCreateDeviceSecure(DriverObject,
+	//	0,
+	//	&nameString,
+	//	FILE_DEVICE_DISK_FILE_SYSTEM,
+	//	0,
+	//	FALSE,
+	//	&ustrSecDDL,NULL,&gControlDeviceObject);
+
+	FspDriverObject = DriverObject;
+	status = FspDeviceCreateSecure(FspFsvolDeviceExtensionKind, 0, &nameString, FILE_DEVICE_DISK_FILE_SYSTEM, 0, FALSE, &ustrSecDDL, NULL, &gControlDeviceObject);
 
 	////VirtualizerEnd();
     if (STATUS_OBJECT_PATH_NOT_FOUND == status) 
@@ -490,14 +496,15 @@ Return Value:
         //
 		//////VirtualizerStart();
         RtlInitUnicodeString( &nameString, FILESPY_FULLDEVICE_NAME2 );
-		
-		status =  IoCreateDeviceSecure(DriverObject,
+		//这里也先不用
+		status =  FspDeviceCreateSecure(FspFsvolDeviceExtensionKind, 0, &nameString, FILE_DEVICE_DISK_FILE_SYSTEM, 0, FALSE, &ustrSecDDL, NULL, &gControlDeviceObject);
+		/*status =  IoCreateDeviceSecure(DriverObject,
 			0,
 			&nameString,
 			FILE_DEVICE_DISK_FILE_SYSTEM,
 			0,
 			FALSE,
-			&ustrSecDDL,NULL,&gControlDeviceObject);
+			&ustrSecDDL,NULL,&gControlDeviceObject);*/
 		//////VirtualizerEnd();
         if (!NT_SUCCESS( status )) 
 		{
